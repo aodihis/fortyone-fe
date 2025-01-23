@@ -1,0 +1,211 @@
+body {
+    font-family: sans-serif;
+    text-align: center;
+    margin: 0;
+}
+
+.pre-game {
+    margin: auto;
+    border: 5px solid black;
+    width: 80%;
+    height: 80%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+
+.pre-game .options {
+    width: 20%;
+    height: 10rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.pre-game .options button {
+    cursor: pointer;
+    margin: 1rem auto;
+    display: block;
+    width: 10rem;
+    height: 4rem;
+    background-color: #754E1A; /* Bright mint green */
+    color: #F8E1B7; /* Dark green text */
+    border: 2px solid #CBA35C;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.pre-game .options button:hover {
+    background-color: white;
+    color: #754E1A;
+    border-color: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.game-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 100vh;
+//margin: 5vh auto;
+    background-color: #007B43;
+//background-color: lightblue;
+//border-radius: 16px;
+    padding: 0;
+}
+
+.deck {
+    position: absolute;
+    list-style: none;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 75px;
+    height: 105px;
+}
+
+.card {
+    overflow: hidden;
+    width: 75px;
+    height: 105px;
+    border-radius: 1px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+//border: 2px solid #333;
+//box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.deck .card {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 3;
+    opacity: 1;
+}
+
+.card.card-back {
+    background-image: url('/assets/images/rummy/back.png');
+}
+
+.player-area {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.left-enemy {
+    left: 0;
+    top: 40%;
+    transform:  rotate(90deg) translate(0, 50%);
+//transform: translate(0, 50%);
+}
+
+.right-enemy {
+    right: 0;
+    top: 40%;
+    transform:  rotate(90deg) translate(0, -50%);
+}
+
+.top-enemy {
+    left: 50%;
+    top: 5%;
+    transform: rotate(180deg) translate(50%, 0);
+}
+
+.current-player {
+    left: 50%;
+    transform: translate(-50%, 0);
+    bottom: 5%;
+}
+
+@media (max-width: 768px) {
+    .top-enemy {
+        top: -5%;
+    }
+
+    .right-enemy {
+        right: -25%;
+    }
+    .left-enemy {
+        left: -25%;
+    }
+
+    .current-player {
+        bottom: -5%;
+    }
+}
+
+.starting-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 10;
+    transform: translate(-66%, -59%);
+}
+
+@keyframes throw-card-bottom {
+    0% {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    100% {
+        top: 80%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
+
+
+@keyframes throw-card-top {
+    0% {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    100% {
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
+
+@keyframes throw-card-left {
+    0% {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    100% {
+        top: 50%;
+        left: 20%;
+        transform: translate(-50%, -50%);
+    }
+}
+
+@keyframes throw-card-right {
+    0% {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    100% {
+        top: 50%;
+        left: 80%;
+        transform: translate(-50%, -50%);
+    }
+}
