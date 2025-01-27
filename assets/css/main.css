@@ -4,6 +4,25 @@ body {
     margin: 0;
 }
 
+button {
+    cursor: pointer;
+    display: block;
+    background-color: #754E1A; /* Bright mint green */
+    color: #F8E1B7; /* Dark green text */
+    border: 2px solid #CBA35C;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: white;
+    color: #754E1A;
+    border-color: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
 .pre-game {
     margin: auto;
     border: 5px solid black;
@@ -81,27 +100,48 @@ body {
 }
 
 .pre-game .waiting-game  button {
-    cursor: pointer;
-    margin: 0.5rem auto;
-    display: block;
     width: 100%;
+    margin: 0.5rem auto;
+    cursor: pointer;
+    display: block;
     height: 3rem;
-    background-color: #754E1A; /* Bright mint green */
-    color: #F8E1B7; /* Dark green text */
-    border: 2px solid #CBA35C;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: all 0.3s ease;
 }
 
-.pre-game .waiting-game  button:hover {
-    background-color: white;
-    color: #754E1A;
-    border-color: white;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+
+.pre-game .join-game {
+    width: 20%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    display: table-cell;
 }
 
+.pre-game .join-game form{
+}
+
+.pre-game .join-game input{
+    margin-top: 0.5rem;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.pre-game .join-game input:focus{
+    border-color: #007bff;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+    outline: none;
+}
+
+.pre-game .join-game button {
+    margin: 1rem auto;
+    display: inline-block;
+    width: 100%;
+}
 
 
 .game-container {

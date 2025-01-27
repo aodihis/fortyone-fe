@@ -1,5 +1,6 @@
 use std::rc::Rc;
-use yew::{function_component, html, use_context, use_state, Callback, Html, Properties};
+use web_sys::wasm_bindgen::JsCast;
+use yew::{function_component, html, use_context, use_state, Callback, Html, Properties, SubmitEvent};
 use crate::context::game_state::GameState;
 use crate::context::players::Player;
 
@@ -7,6 +8,8 @@ use crate::context::players::Player;
 enum PreGamePhase {
     Home,
     Waiting,
+    Join,
+    Create
 }
 
 #[derive(Clone, PartialEq)]
@@ -22,7 +25,7 @@ pub struct PreGameProps {
 #[function_component]
 pub fn PreGame(props: &PreGameProps) -> Html {
 
-    let phase = use_state(|| PreGamePhase::Waiting);
+    let phase = use_state(|| PreGamePhase::Join);
     let game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
 
     let onclick = {
@@ -54,10 +57,40 @@ pub fn PreGame(props: &PreGameProps) -> Html {
                             <button onclick={join_onclick}>{"Join Game"}</button>
                         </div>
                     }
-                }else {
+                } else if *phase == PreGamePhase::Waiting {
                     html!(<WaitingGame/>)
+                } else {
+                    html!(<JoinGame/>)
                 }
             }
+        </div>
+    }
+}
+
+#[function_component]
+pub fn JoinGame() -> Html {
+
+    let onsubmit = Callback::from(move |e: SubmitEvent| {
+        e.prevent_default();
+        let target = e.target();
+        let form = target.and_then(|t| t.dyn_into::<web_sys::HtmlFormElement>().ok()).expect("Couldn't get HtmlFormElement");
+        // let game_id = match form.get_with_name("game-id").and_then(|id| id.value_of()) {
+        //     Some(id) => id,
+        //     None => {return }
+        // };
+        let name = form.get_with_name("name").and_then(|name| Some(name.to_string()));
+        // web_sys::console::log_1(&game_id.into());
+        web_sys::console::log_1(&name.into());
+
+
+    });
+    html! {
+        <div class="join-game">
+            <form onsubmit={onsubmit}>
+                <input name="game-id" type="text" placeholder="Please input game id"/>
+                <input name="name" type="text" placeholder="Please your input name"/>
+                <button type="submit">{"Join Game"}</button>
+            </form>
         </div>
     }
 }
