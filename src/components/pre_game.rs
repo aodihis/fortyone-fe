@@ -1,5 +1,6 @@
 use std::rc::Rc;
 use web_sys::wasm_bindgen::JsCast;
+use web_sys::window;
 use yew::{function_component, html, use_context, use_state, Callback, Html, Properties, SubmitEvent};
 use crate::context::game_state::GameState;
 use crate::context::players::Player;
@@ -25,7 +26,7 @@ pub struct PreGameProps {
 #[function_component]
 pub fn PreGame(props: &PreGameProps) -> Html {
 
-    let phase = use_state(|| PreGamePhase::Join);
+    let phase = use_state(|| PreGamePhase::Waiting);
     let game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
 
     let onclick = {
@@ -59,7 +60,9 @@ pub fn PreGame(props: &PreGameProps) -> Html {
                     }
                 } else if *phase == PreGamePhase::Waiting {
                     html!(<WaitingGame/>)
-                } else {
+                } else if *phase == PreGamePhase::Create {
+                    html!(<CreateGame/>)
+                } else{
                     html!(<JoinGame/>)
                 }
             }
@@ -74,21 +77,46 @@ pub fn JoinGame() -> Html {
         e.prevent_default();
         let target = e.target();
         let form = target.and_then(|t| t.dyn_into::<web_sys::HtmlFormElement>().ok()).expect("Couldn't get HtmlFormElement");
-        // let game_id = match form.get_with_name("game-id").and_then(|id| id.value_of()) {
-        //     Some(id) => id,
-        //     None => {return }
-        // };
-        let name = form.get_with_name("name").and_then(|name| Some(name.to_string()));
-        // web_sys::console::log_1(&game_id.into());
-        web_sys::console::log_1(&name.into());
+        let name_element = form.get_with_name("name").and_then(|name| name.dyn_into::<web_sys::HtmlInputElement>().ok()).unwrap();
+        let game_id_element = form.get_with_name("game-id").and_then(|name| name.dyn_into::<web_sys::HtmlInputElement>().ok()).unwrap();
 
+        let name = name_element.value();
+        let game_id = game_id_element.value();
 
+        if game_id.is_empty() || name.is_empty() {
+            if let Some(window) = window() {
+                window.alert_with_message("Please, input correct game id.").expect("Window is not ready");
+            }
+            return;
+        }
     });
     html! {
-        <div class="join-game">
+        <div class="game-form">
             <form onsubmit={onsubmit}>
-                <input name="game-id" type="text" placeholder="Please input game id"/>
-                <input name="name" type="text" placeholder="Please your input name"/>
+                <input name="game-id" type="text" placeholder="Please, input game id"/>
+                <input name="name" type="text" placeholder="Please, input your name"/>
+                <button type="submit">{"Join Game"}</button>
+            </form>
+        </div>
+    }
+}
+
+#[function_component]
+pub fn CreateGame() -> Html {
+
+    let onsubmit = Callback::from(move |e: SubmitEvent| {
+        e.prevent_default();
+        let target = e.target();
+        let form = target.and_then(|t| t.dyn_into::<web_sys::HtmlFormElement>().ok()).expect("Couldn't get HtmlFormElement");
+        let name_element = form.get_with_name("name").and_then(|name| name.dyn_into::<web_sys::HtmlInputElement>().ok()).unwrap();
+        let name = name_element.value();
+
+    });
+
+    html! {
+        <div class="game-form">
+            <form onsubmit={onsubmit}>
+                <input name="name" type="text" placeholder="Please, input your name"/>
                 <button type="submit">{"Join Game"}</button>
             </form>
         </div>
@@ -98,6 +126,7 @@ pub fn JoinGame() -> Html {
 #[function_component]
 pub fn WaitingGame() -> Html {
     let game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
+    let game_id = "U23rads".to_string();
     let dummy_player = Player {
         name: "Kasandra".to_string(),
         pos: 0,
@@ -110,23 +139,36 @@ pub fn WaitingGame() -> Html {
     let players = dummy.iter().map(|player|html!(<div class="wg-player">{player.name.clone()}</div>)).collect::<Html>();
     // let players = game_state.players.iter().map(|player|html!(<div class="wg-player">{player.name.clone()}</div>)).collect::<Html>();
 
-
+    let copy_id = Callback::from(move |_| {
+        if let Some(window) = window() {
+            window.navigator().clipboard().write_text(&*game_id);
+        }
+    });
     html! {
         <>
             <div class="waiting-game">
-                <h3>{"Waiting for players"}</h3>
-                <div class="wg-players">
-                    {players}
+                <div class="box">
+                        <h3>{"Waiting for players"}</h3>
+                        <div class="wg-players">
+                            {players}
+                        </div>
                 </div>
-                {
-                    if dummy.len() > 1 {
-                        html! {<button class="">{"Start Game"}</button>}
-                    } else {
-                        html!{}
+                <div class="box">
+                    <div class="game-id-container">
+                        <span class="game-id" id="game-id">{"Usd329823"}</span>
+                        <button class="copy-id" title="Copy" onclick={copy_id}>
+                           { "📋" }
+                        </button>
+                    </div>
+                    {
+                        if dummy.len() > 1 {
+                            html! {<button class="">{"Start Game"}</button>}
+                        } else {
+                            html!{}
+                        }
                     }
-                }
-                <button class="">{"Leave"}</button>
-
+                    <button class="">{"Leave"}</button>
+                </div>
             </div>
         </>
     }
