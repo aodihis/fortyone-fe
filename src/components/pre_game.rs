@@ -2,8 +2,10 @@ use std::rc::Rc;
 use web_sys::wasm_bindgen::JsCast;
 use web_sys::window;
 use yew::{function_component, html, use_context, use_state, Callback, Html, Properties, SubmitEvent};
+use yew::platform::spawn_local;
 use crate::context::game_state::GameState;
 use crate::context::players::Player;
+use gloo_timers::future::TimeoutFuture;
 
 #[derive(Clone, PartialEq)]
 enum PreGamePhase {
@@ -126,6 +128,8 @@ pub fn CreateGame() -> Html {
 #[function_component]
 pub fn WaitingGame() -> Html {
     let game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
+    let copy_button_label = use_state(|| "📋");
+
     let game_id = "U23rads".to_string();
     let dummy_player = Player {
         name: "Kasandra".to_string(),
@@ -139,11 +143,22 @@ pub fn WaitingGame() -> Html {
     let players = dummy.iter().map(|player|html!(<div class="wg-player">{player.name.clone()}</div>)).collect::<Html>();
     // let players = game_state.players.iter().map(|player|html!(<div class="wg-player">{player.name.clone()}</div>)).collect::<Html>();
 
-    let copy_id = Callback::from(move |_| {
+    let copy_id = {
+        let game_id = game_id.clone();
+        let copy_button_label = copy_button_label.clone();
+        Callback::from(move |_| {
         if let Some(window) = window() {
             window.navigator().clipboard().write_text(&*game_id);
+            copy_button_label.set("✅");
+            {
+                let copy_button_label = copy_button_label.clone();
+                spawn_local(async move {
+                    TimeoutFuture::new(1000).await; // Wait 2 seconds
+                    copy_button_label.set("📋");
+                });
+            }
         }
-    });
+    })};
     html! {
         <>
             <div class="waiting-game">
@@ -155,9 +170,9 @@ pub fn WaitingGame() -> Html {
                 </div>
                 <div class="box">
                     <div class="game-id-container">
-                        <span class="game-id" id="game-id">{"Usd329823"}</span>
+                        <span class="game-id" id="game-id">{game_id}</span>
                         <button class="copy-id" title="Copy" onclick={copy_id}>
-                           { "📋" }
+                           { *copy_button_label }
                         </button>
                     </div>
                     {
