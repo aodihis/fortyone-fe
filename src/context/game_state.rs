@@ -1,3 +1,4 @@
+use yew::Callback;
 use crate::context::players::Player;
 
 
@@ -32,6 +33,9 @@ pub struct GameState {
     pub players: Vec<Player>,
     pub event: Option<InGameEvent>,
     pub counter: usize,
+    // pub join: Callback<String>,
+    // pub create_game: Callback<()>,
+    // pub action: Callback<String>,
 }
 
 impl PartialEq for GameState {
