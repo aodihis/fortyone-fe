@@ -32,7 +32,7 @@ impl Component for Game {
 
         let game_state = self.game_state.clone();
 
-        html!(
+        html! {
             <div class="game-container">
                 <ContextProvider<Rc<GameState>> context={game_state}>
                     <PreGame/>
@@ -40,6 +40,6 @@ impl Component for Game {
                 </ContextProvider<Rc<GameState>>>
 
             </div>
-        )
+        }
     }
 }

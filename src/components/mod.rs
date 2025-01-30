@@ -1,3 +1,4 @@
 pub mod game;
 mod pre_game;
-mod enemy;
+pub mod enemy;
+pub mod in_game;

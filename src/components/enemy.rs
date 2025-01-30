@@ -5,7 +5,7 @@ use crate::context::game_state::GameState;
 
 
 #[derive(Clone)]
-enum EnemyPos {
+pub enum EnemyPos {
     Left,
     Right,
     Top
@@ -71,13 +71,13 @@ impl Component for Enemy {
 
         let items = (0..self.total_cards).collect::<Vec<_>>();
 
-        html!(
+        html! {
              <div class={class}>
                 {
                     items.iter().map(|_| html!{<div class="card card-back"></div>}).collect::<Html>()
                 }
             </div>
-        )
+        }
 
     }
 }
