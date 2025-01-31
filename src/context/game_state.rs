@@ -12,7 +12,7 @@ pub enum InGameMovement {
 
 #[derive(Clone)]
 pub struct InGameEvent {
-    pub movement: Option<InGameMovement>,
+    pub _movement: Option<InGameMovement>,
     from: Option<Player>,
     to: Option<Player>,
 }

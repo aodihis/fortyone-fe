@@ -16,25 +16,21 @@ impl Component for Game {
     fn create(ctx: &Context<Self>) -> Self {
         let dummy_players = vec![Player{
             name: "P1".to_string(),
-            pos: 0,
             score: 0,
             bin: vec![],
-            hand: vec!["".to_string(),"".to_string(),"".to_string(),"".to_string()],
+            hand: vec!["HA".to_string(),"S3".to_string(),"D10".to_string(),"C2".to_string()],
         },Player{
             name: "P2".to_string(),
-            pos: 1,
             score: 0,
             bin: vec![],
             hand: vec!["".to_string(),"".to_string(),"".to_string(),"".to_string()],
         },Player{
             name: "P3".to_string(),
-            pos: 2,
             score: 0,
             bin: vec![],
             hand: vec!["".to_string(),"".to_string(),"".to_string(),"".to_string()],
         },Player{
             name: "P4".to_string(),
-            pos: 3,
             score: 0,
             bin: vec![],
             hand: vec!["".to_string(),"".to_string(),"".to_string(),"".to_string()],

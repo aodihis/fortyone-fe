@@ -130,7 +130,10 @@ pub fn WaitingGame() -> Html {
     let game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
     let copy_button_label = use_state(|| "📋");
 
-    let game_id = "U23rads".to_string();
+    let game_id = match &game_state.game_id {
+        Some(game_id) => game_id.clone(),
+        _ => return html!(),
+    };
 
     let players = game_state.players.iter().map(|player|html!(<div class="wg-player">{player.name.clone()}</div>)).collect::<Html>();
     // let players = game_state.players.iter().map(|player|html!(<div class="wg-player">{player.name.clone()}</div>)).collect::<Html>();

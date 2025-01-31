@@ -1,6 +1,7 @@
 use std::rc::Rc;
 use std::sync::mpsc::SendError;
 use yew::{function_component, html, Component, Context, ContextHandle, Html, Properties};
+use crate::components::current_player::CurrentPlayer;
 use crate::components::enemy::{Enemy, EnemyPos};
 use crate::context::game_state::GameState;
 
@@ -70,6 +71,7 @@ impl Component for InGame{
             <>
                 <Deck total_cards={self.card_left}/>
                 {for enemies}
+                <CurrentPlayer />
             </>
         }
     }

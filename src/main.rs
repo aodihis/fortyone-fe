@@ -1,6 +1,6 @@
 mod components;
 mod context;
-mod utils;
+pub mod utils;
 
 use yew::prelude::*;
 use crate::components::game::Game;
