@@ -57,7 +57,11 @@ impl Component for CurrentPlayer {
                     }
 
                 </div>
-                <div class="player-name">{self.name.clone()}</div>
+                <div class="player-name"><span>{self.name.clone()}</span>
+                    {
+                        html!{<span class="loader"></span>}
+                    }
+                </div>
             </div>
         }
     }

@@ -30,6 +30,7 @@ pub struct GameState {
     pub game_id: Option<String>,
     pub card_left: u8,
     pub current_player_index: usize,
+    pub current_turn_index: usize,
     pub player_name: Option<String>,
     pub players: Vec<Player>,
     pub event: Option<InGameEvent>,

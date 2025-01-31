@@ -493,6 +493,26 @@ button:hover {
     }
 }
 
+.loader {
+    display: inline-block;
+    margin-left: 5px;
+    width: 10px;
+    height: 10px;
+    border: 1px solid #ccc;  /* Light grey border */
+    border-top: 1px solid #3498db; /* Blue top border */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .starting-card {
     position: absolute;
     top: 50%;
