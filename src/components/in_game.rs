@@ -1,16 +1,21 @@
 use std::rc::Rc;
 use std::sync::mpsc::SendError;
+use gloo_timers::future::TimeoutFuture;
 use yew::{function_component, html, Component, Context, ContextHandle, Html, Properties};
+use yew::platform::spawn_local;
 use crate::components::current_player::CurrentPlayer;
 use crate::components::enemy::{Enemy, EnemyPos};
 use crate::context::game_state::GameState;
 
+#[derive(PartialEq)]
 enum Phase {
-    Start
+    Dealing,
+    Sorting,
 }
 
 pub enum Msg {
     StateChanged(Rc<GameState>),
+    PhaseChanged(Phase),
 }
 pub struct InGame{
     phase: Phase,
@@ -31,7 +36,7 @@ impl Component for InGame{
             .expect("context to be set");
 
         Self {
-            phase: Phase::Start,
+            phase: Phase::Dealing,
             total_players: state.players.len() as u8,
             current_player_index: state.current_player_index,
             card_left: state.card_left,
@@ -46,6 +51,10 @@ impl Component for InGame{
                 self.current_player_index = state.current_player_index;
                 self.card_left = state.card_left;
                true
+            }
+            Msg::PhaseChanged(phase) => {
+                self.phase = phase;
+                true
             }
         }
     }
@@ -67,11 +76,32 @@ impl Component for InGame{
                 html! { <Enemy index={adjusted_index} pos={pos} /> }
             }).collect::<Vec<Html>>();
 
+        if self.phase == Phase::Dealing {
+            let link = ctx.link().clone();
+            let time = self.total_players as u32 * 4 * 1000;
+            spawn_local( async move {
+                TimeoutFuture::new(time).await;
+                link.send_message(Msg::PhaseChanged(Phase::Sorting));
+            });
+        }
+
         html! {
             <>
                 <Deck total_cards={self.card_left}/>
-                {for enemies}
-                <CurrentPlayer />
+                {
+                    if self.phase == Phase::Dealing {
+                        html!{<CardDistribution total_players={total_players}/>}
+                    } else {
+                        html!{
+                            <>
+                                {for enemies}
+                                <CurrentPlayer />
+                            </>
+                        }
+                    }
+                }
+
+
             </>
         }
     }
@@ -95,5 +125,28 @@ pub fn Deck(props: &DeckProps) -> Html {
         <div class="deck">
             { for cards }
         </div>
+    }
+}
+
+#[derive(Properties, Clone, PartialEq)]
+pub struct CardDistributionProps {
+    pub total_players: u8,
+}
+#[function_component]
+pub fn CardDistribution(props: &CardDistributionProps) -> Html {
+    let direction = ["throw-card-bottom", "throw-card-top", "throw-card-right", "throw-card-left"];
+    html! {
+        <>
+            {
+                (0..props.total_players*4).map(|i| {
+                    let n : usize = i as usize % 4;
+                    let dir = direction[n];
+                    let style = format!("animation: {dir} 1s ease-in-out {i}s forwards;");
+                    html!{
+                        <div class="starting-card card card-back" style={style}></div>
+                    }
+                }).collect::<Html>()
+            }
+        </>
     }
 }
