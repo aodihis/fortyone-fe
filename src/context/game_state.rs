@@ -17,18 +17,18 @@ pub struct InGameEvent {
     to: Option<Player>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub enum GameStatus {
-    NotStarted,
-    Waiting,
+    PreGame,
     InProgress,
-    GameOver,
+    PostGame,
 }
 
 #[derive(Clone)]
 pub struct GameState {
     pub game_status: GameStatus,
     pub game_id: Option<String>,
+    pub current_player_index: usize,
     pub player_name: Option<String>,
     pub players: Vec<Player>,
     pub event: Option<InGameEvent>,

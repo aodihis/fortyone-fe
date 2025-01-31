@@ -4,7 +4,7 @@ use crate::context::game_state::GameState;
 
 
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub enum EnemyPos {
     Left,
     Right,
@@ -62,7 +62,6 @@ impl Component for Enemy {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-
         let class = match self.pos {
             EnemyPos::Left => {"left-enemy player-area"}
             EnemyPos::Right => {"right-enemy player-area"}

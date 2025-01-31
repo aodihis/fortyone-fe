@@ -220,7 +220,7 @@ button:hover {
 }
 
 .card.card-back {
-    background-image: url('/assets/images/rummy/back.png');
+    background-image: url('/public/images/rummy/back.png');
 }
 
 .player-area {

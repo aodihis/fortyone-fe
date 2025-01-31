@@ -28,7 +28,7 @@ pub struct PreGameProps {
 #[function_component]
 pub fn PreGame(props: &PreGameProps) -> Html {
 
-    let phase = use_state(|| PreGamePhase::Waiting);
+    let phase = use_state(|| PreGamePhase::Home);
     let game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
 
     let onclick = {
@@ -131,16 +131,8 @@ pub fn WaitingGame() -> Html {
     let copy_button_label = use_state(|| "📋");
 
     let game_id = "U23rads".to_string();
-    let dummy_player = Player {
-        name: "Kasandra".to_string(),
-        pos: 0,
-        score: 0,
-        bin: vec![],
-        hand: vec![],
-    };
-    let dummy = vec![dummy_player.clone(), dummy_player.clone(), dummy_player.clone(), dummy_player];
 
-    let players = dummy.iter().map(|player|html!(<div class="wg-player">{player.name.clone()}</div>)).collect::<Html>();
+    let players = game_state.players.iter().map(|player|html!(<div class="wg-player">{player.name.clone()}</div>)).collect::<Html>();
     // let players = game_state.players.iter().map(|player|html!(<div class="wg-player">{player.name.clone()}</div>)).collect::<Html>();
 
     let copy_id = {
@@ -148,7 +140,7 @@ pub fn WaitingGame() -> Html {
         let copy_button_label = copy_button_label.clone();
         Callback::from(move |_| {
         if let Some(window) = window() {
-            window.navigator().clipboard().write_text(&*game_id);
+            let _ = window.navigator().clipboard().write_text(&*game_id);
             copy_button_label.set("✅");
             {
                 let copy_button_label = copy_button_label.clone();
@@ -176,7 +168,7 @@ pub fn WaitingGame() -> Html {
                         </button>
                     </div>
                     {
-                        if dummy.len() > 1 {
+                        if game_state.players.len() > 1 {
                             html! {<button class="">{"Start Game"}</button>}
                         } else {
                             html!{}
