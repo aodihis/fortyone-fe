@@ -210,6 +210,12 @@ button:hover {
 //box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
 }
 
+.current-player .card:hover {
+    transform: scale(1.5);
+    z-index: 15;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.5);
+}
+
 .deck .card {
     display: block;
     position: absolute;
