@@ -28,6 +28,7 @@ pub enum GameStatus {
 pub struct GameState {
     pub game_status: GameStatus,
     pub game_id: Option<String>,
+    pub card_left: u8,
     pub current_player_index: usize,
     pub player_name: Option<String>,
     pub players: Vec<Player>,

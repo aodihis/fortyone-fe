@@ -223,6 +223,215 @@ button:hover {
     background-image: url('/public/images/rummy/back.png');
 }
 
+.card.heart-ace {
+    background-image: url('/public/images/rummy/ace_hearts.png');
+}
+
+.card.heart-two {
+    background-image: url('/public/images/rummy/two_hearts.png');
+}
+
+.card.heart-three {
+    background-image: url('/public/images/rummy/three_hearts.png');
+}
+
+.card.heart-four {
+    background-image: url('/public/images/rummy/four_hearts.png');
+}
+
+.card.heart-five {
+    background-image: url('/public/images/rummy/five_hearts.png');
+}
+
+.card.heart-six {
+    background-image: url('/public/images/rummy/six_hearts.png');
+}
+
+.card.heart-seven {
+    background-image: url('/public/images/rummy/seven_hearts.png');
+}
+
+.card.heart-eight {
+    background-image: url('/public/images/rummy/eight_hearts.png');
+}
+
+.card.heart-nine {
+    background-image: url('/public/images/rummy/nine_hearts.png');
+}
+
+.card.heart-ten {
+    background-image: url('/public/images/rummy/ten_hearts.png');
+}
+
+.card.heart-jack {
+    background-image: url('/public/images/rummy/jack_hearts.png');
+}
+
+.card.heart-queen {
+    background-image: url('/public/images/rummy/queen_hearts.png');
+}
+
+.card.heart-king {
+    background-image: url('/public/images/rummy/king_hearts.png');
+}
+
+.card.diamond-ace {
+    background-image: url('/public/images/rummy/ace_diamonds.png');
+}
+
+.card.diamond-two {
+    background-image: url('/public/images/rummy/two_diamonds.png');
+}
+
+.card.diamond-three {
+    background-image: url('/public/images/rummy/three_diamonds.png');
+}
+
+.card.diamond-four {
+    background-image: url('/public/images/rummy/four_diamonds.png');
+}
+
+.card.diamond-five {
+    background-image: url('/public/images/rummy/five_diamonds.png');
+}
+
+.card.diamond-six {
+    background-image: url('/public/images/rummy/six_diamonds.png');
+}
+
+.card.diamond-seven {
+    background-image: url('/public/images/rummy/seven_diamonds.png');
+}
+
+.card.diamond-eight {
+    background-image: url('/public/images/rummy/eight_diamonds.png');
+}
+
+.card.diamond-nine {
+    background-image: url('/public/images/rummy/nine_diamonds.png');
+}
+
+.card.diamond-ten {
+    background-image: url('/public/images/rummy/ten_diamonds.png');
+}
+
+.card.diamond-jack {
+    background-image: url('/public/images/rummy/jack_diamonds.png');
+}
+
+.card.diamond-queen {
+    background-image: url('/public/images/rummy/queen_diamonds.png');
+}
+
+.card.diamond-king {
+    background-image: url('/public/images/rummy/king_diamonds.png');
+}
+
+.card.spade-ace {
+    background-image: url('/public/images/rummy/ace_spades.png');
+}
+
+.card.spade-two {
+    background-image: url('/public/images/rummy/two_spades.png');
+}
+
+.card.spade-three {
+    background-image: url('/public/images/rummy/three_spades.png');
+}
+
+.card.spade-four {
+    background-image: url('/public/images/rummy/four_spades.png');
+}
+
+.card.spade-five {
+    background-image: url('/public/images/rummy/five_spades.png');
+}
+
+.card.spade-six {
+    background-image: url('/public/images/rummy/six_spades.png');
+}
+
+.card.spade-seven {
+    background-image: url('/public/images/rummy/seven_spades.png');
+}
+
+.card.spade-eight {
+    background-image: url('/public/images/rummy/eight_spades.png');
+}
+
+.card.spade-nine {
+    background-image: url('/public/images/rummy/nine_spades.png');
+}
+
+.card.spade-ten {
+    background-image: url('/public/images/rummy/ten_spades.png');
+}
+
+.card.spade-jack {
+    background-image: url('/public/images/rummy/jack_spades.png');
+}
+
+.card.spade-queen {
+    background-image: url('/public/images/rummy/queen_spades.png');
+}
+
+.card.spade-king {
+    background-image: url('/public/images/rummy/king_spades.png');
+}
+
+.card.club-ace {
+    background-image: url('/public/images/rummy/ace_clubs.png');
+}
+
+.card.club-two {
+    background-image: url('/public/images/rummy/two_clubs.png');
+}
+
+.card.club-three {
+    background-image: url('/public/images/rummy/three_clubs.png');
+}
+
+.card.club-four {
+    background-image: url('/public/images/rummy/four_clubs.png');
+}
+
+.card.club-five {
+    background-image: url('/public/images/rummy/five_clubs.png');
+}
+
+.card.club-six {
+    background-image: url('/public/images/rummy/six_clubs.png');
+}
+
+.card.club-seven {
+    background-image: url('/public/images/rummy/seven_clubs.png');
+}
+
+.card.club-eight {
+    background-image: url('/public/images/rummy/eight_clubs.png');
+}
+
+.card.club-nine {
+    background-image: url('/public/images/rummy/nine_clubs.png');
+}
+
+.card.club-ten {
+    background-image: url('/public/images/rummy/ten_clubs.png');
+}
+
+.card.club-jack {
+    background-image: url('/public/images/rummy/jack_clubs.png');
+}
+
+.card.club-queen {
+    background-image: url('/public/images/rummy/queen_clubs.png');
+}
+
+.card.club-king {
+    background-image: url('/public/images/rummy/king_clubs.png');
+}
+
+
 .player-area {
     position: absolute;
     display: flex;

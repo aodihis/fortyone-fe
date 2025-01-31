@@ -42,6 +42,7 @@ impl Component for Game {
         let game_state = Rc::new(GameState {
             game_status: GameStatus::InProgress,
             game_id: None,
+            card_left: 52,
             current_player_index: 0,
             player_name: None,
             players: dummy_players,
