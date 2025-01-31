@@ -433,7 +433,6 @@ button:hover {
 
 
 .player-area {
-    position: absolute;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -441,6 +440,7 @@ button:hover {
 }
 
 .left-enemy {
+    position: absolute;
     left: 0;
     top: 40%;
     transform:  rotate(90deg) translate(0, 50%);
@@ -448,21 +448,32 @@ button:hover {
 }
 
 .right-enemy {
+    position: absolute;
     right: 0;
     top: 40%;
-    transform:  rotate(90deg) translate(0, -50%);
+    transform:  rotate(-90deg) translate(0, 50%);
 }
 
 .top-enemy {
+    position: absolute;
     left: 50%;
-    top: 5%;
+    top: 2%;
     transform: rotate(180deg) translate(50%, 0);
 }
 
+.player-name {
+    margin: 5px 0 0;
+}
+
+.top-enemy .player-name {
+    rotate: 180deg;
+}
+
 .current-player {
+    position: absolute;
     left: 50%;
     transform: translate(-50%, 0);
-    bottom: 5%;
+    bottom: 2%;
 }
 
 @media (max-width: 768px) {

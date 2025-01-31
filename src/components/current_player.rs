@@ -45,15 +45,19 @@ impl Component for CurrentPlayer {
     fn view(&self, ctx: &Context<Self>) -> Html {
 
         html!{
-            <div class="player-area current-player">
-                {
-                    self.hand.iter().map(|h| {
-                        let card_class = card_class(h);
-                        html!{
-                            <div class={classes!("card", card_class)}></div>
-                        }
-                    }).collect::<Html>()
-                }
+            <div class="current-player">
+                <div class="player-area">
+                    {
+                        self.hand.iter().map(|h| {
+                            let card_class = card_class(h);
+                            html!{
+                                <div class={classes!("card", card_class)}></div>
+                            }
+                        }).collect::<Html>()
+                    }
+
+                </div>
+                <div class="player-name">{self.name.clone()}</div>
             </div>
         }
     }

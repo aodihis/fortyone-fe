@@ -63,18 +63,21 @@ impl Component for Enemy {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let class = match self.pos {
-            EnemyPos::Left => {"left-enemy player-area"}
-            EnemyPos::Right => {"right-enemy player-area"}
-            EnemyPos::Top => {"top-enemy player-area"}
+            EnemyPos::Left => {"left-enemy"}
+            EnemyPos::Right => {"right-enemy"}
+            EnemyPos::Top => {"top-enemy"}
         };
 
         let items = (0..self.total_cards).collect::<Vec<_>>();
 
         html! {
              <div class={class}>
-                {
-                    items.iter().map(|_| html!{<div class="card card-back"></div>}).collect::<Html>()
-                }
+                <div class="player-area">
+                    {
+                        items.iter().map(|_| html!{<div class="card card-back"></div>}).collect::<Html>()
+                    }
+                </div>
+                <div class="player-name">{self.name.clone()}</div>
             </div>
         }
 

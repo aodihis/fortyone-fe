@@ -36,7 +36,7 @@ impl Component for InGame{
             .expect("context to be set");
 
         Self {
-            phase: Phase::Dealing,
+            phase: Phase::Sorting,
             total_players: state.players.len() as u8,
             current_player_index: state.current_player_index,
             card_left: state.card_left,
