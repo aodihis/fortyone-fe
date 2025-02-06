@@ -27,6 +27,7 @@ pub struct Enemy {
     name: String,
     total_cards: u8,
     bin: Vec<String>,
+    is_turn: bool,
     _listener: ContextHandle<Rc<GameState>>
 }
 
@@ -46,6 +47,7 @@ impl Component for Enemy {
             name: state.players[index as usize].name.clone(),
             total_cards: state.players[index as usize].hand.len() as u8,
             bin: vec![],
+            is_turn: state.current_player_index == index as usize,
             _listener,
         }
     }
@@ -56,6 +58,7 @@ impl Component for Enemy {
                 let index = self.index;
                 self.total_cards = state.players[index as usize].hand.len() as u8;
                 self.bin = state.players[index as usize].bin.clone();
+                self.is_turn = state.current_player_index == index as usize;
                 true
             }
         }
@@ -77,7 +80,15 @@ impl Component for Enemy {
                         items.iter().map(|_| html!{<div class="card card-back"></div>}).collect::<Html>()
                     }
                 </div>
-                <div class="player-name">{self.name.clone()}</div>
+                <div class="player-name"><span>{self.name.clone()}</span>
+                    {
+                        if self.is_turn {
+                            html!{<span class="loader"></span>}
+                        } else {
+                            html!{}
+                        }
+                    }
+                </div>
             </div>
         }
 

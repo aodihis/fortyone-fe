@@ -113,6 +113,8 @@ name = "fortyone-fe"
 version = "0.1.0"
 dependencies = [
  "gloo-timers 0.3.0",
+ "serde",
+ "serde_json",
  "web-sys",
  "yew",
 ]

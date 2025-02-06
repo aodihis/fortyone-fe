@@ -2,7 +2,7 @@ use std::rc::Rc;
 use yew::{html, Component, Context, ContextProvider, Html};
 use crate::components::in_game::InGame;
 use crate::components::pre_game::PreGame;
-use crate::context::game_state::{GameState, GameStatus};
+use crate::context::game_state::{GamePhase, GameState, GameStatus};
 use crate::context::players::Player;
 
 pub struct Game {
@@ -41,6 +41,7 @@ impl Component for Game {
             card_left: 52,
             current_player_index: 0,
             current_turn_index: 0,
+            current_turn_phase: GamePhase::P1,
             player_name: Some(String::from("Mia")),
             players: dummy_players,
             event: None,

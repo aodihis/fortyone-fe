@@ -1,7 +1,14 @@
+use serde::{Deserialize, Serialize};
 use yew::Callback;
 use crate::context::players::Player;
 
 
+#[derive(Debug,Clone, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum GamePhase {
+    P1,
+    P2
+}
 #[derive(Clone)]
 pub enum InGameMovement {
     Draw,
@@ -31,6 +38,7 @@ pub struct GameState {
     pub card_left: u8,
     pub current_player_index: usize,
     pub current_turn_index: usize,
+    pub current_turn_phase:GamePhase,
     pub player_name: Option<String>,
     pub players: Vec<Player>,
     pub event: Option<InGameEvent>,
