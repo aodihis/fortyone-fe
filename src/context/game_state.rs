@@ -7,7 +7,8 @@ use crate::context::players::Player;
 #[serde(rename_all = "lowercase")]
 pub enum PlayerPhase {
     P1,
-    P2
+    P2,
+    Waiting,
 }
 #[derive(Clone)]
 pub enum InGameMovement {

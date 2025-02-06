@@ -17,22 +17,22 @@ impl Component for Game {
         let dummy_players = vec![Player{
             name: "P1".to_string(),
             score: 0,
-            bin: vec![],
-            hand: vec!["HA".to_string(),"S3".to_string(),"D10".to_string(),"C2".to_string()],
+            bin: vec!["HA".to_string(),"S3".to_string(),"D10".to_string(),"C2".to_string()],
+            hand: vec!["H3".to_string(),"S8".to_string(),"D3".to_string(),"C2".to_string()],
         },Player{
             name: "P2".to_string(),
             score: 0,
-            bin: vec![],
+            bin: vec!["HA".to_string(),"S3".to_string(),"D10".to_string(),"C2".to_string()],
             hand: vec!["".to_string(),"".to_string(),"".to_string(),"".to_string()],
         },Player{
             name: "P3".to_string(),
             score: 0,
-            bin: vec![],
+            bin: vec!["HA".to_string(),"S3".to_string(),"D10".to_string(),"C2".to_string()],
             hand: vec!["".to_string(),"".to_string(),"".to_string(),"".to_string()],
         },Player{
             name: "P4".to_string(),
             score: 0,
-            bin: vec![],
+            bin: vec!["HA".to_string(),"S3".to_string(),"D10".to_string(),"C2".to_string()],
             hand: vec!["".to_string(),"".to_string(),"".to_string(),"".to_string()],
         }];
         let game_state = Rc::new(GameState {

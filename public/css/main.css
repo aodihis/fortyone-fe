@@ -206,8 +206,6 @@ button:hover {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-//border: 2px solid #333;
-//box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .current-player .card:hover {
@@ -225,215 +223,215 @@ button:hover {
     opacity: 1;
 }
 
-.card.card-back {
+.card-back {
     background-image: url('/public/images/rummy/back.png');
 }
 
-.card.heart-ace {
+.heart-ace {
     background-image: url('/public/images/rummy/ace_hearts.png');
 }
 
-.card.heart-two {
+.heart-two {
     background-image: url('/public/images/rummy/two_hearts.png');
 }
 
-.card.heart-three {
+.heart-three {
     background-image: url('/public/images/rummy/three_hearts.png');
 }
 
-.card.heart-four {
+.heart-four {
     background-image: url('/public/images/rummy/four_hearts.png');
 }
 
-.card.heart-five {
+.heart-five {
     background-image: url('/public/images/rummy/five_hearts.png');
 }
 
-.card.heart-six {
+.heart-six {
     background-image: url('/public/images/rummy/six_hearts.png');
 }
 
-.card.heart-seven {
+.heart-seven {
     background-image: url('/public/images/rummy/seven_hearts.png');
 }
 
-.card.heart-eight {
+.heart-eight {
     background-image: url('/public/images/rummy/eight_hearts.png');
 }
 
-.card.heart-nine {
+.heart-nine {
     background-image: url('/public/images/rummy/nine_hearts.png');
 }
 
-.card.heart-ten {
+.heart-ten {
     background-image: url('/public/images/rummy/ten_hearts.png');
 }
 
-.card.heart-jack {
+.heart-jack {
     background-image: url('/public/images/rummy/jack_hearts.png');
 }
 
-.card.heart-queen {
+.heart-queen {
     background-image: url('/public/images/rummy/queen_hearts.png');
 }
 
-.card.heart-king {
+.heart-king {
     background-image: url('/public/images/rummy/king_hearts.png');
 }
 
-.card.diamond-ace {
+.diamond-ace {
     background-image: url('/public/images/rummy/ace_diamonds.png');
 }
 
-.card.diamond-two {
+.diamond-two {
     background-image: url('/public/images/rummy/two_diamonds.png');
 }
 
-.card.diamond-three {
+.diamond-three {
     background-image: url('/public/images/rummy/three_diamonds.png');
 }
 
-.card.diamond-four {
+.diamond-four {
     background-image: url('/public/images/rummy/four_diamonds.png');
 }
 
-.card.diamond-five {
+.diamond-five {
     background-image: url('/public/images/rummy/five_diamonds.png');
 }
 
-.card.diamond-six {
+.diamond-six {
     background-image: url('/public/images/rummy/six_diamonds.png');
 }
 
-.card.diamond-seven {
+.diamond-seven {
     background-image: url('/public/images/rummy/seven_diamonds.png');
 }
 
-.card.diamond-eight {
+.diamond-eight {
     background-image: url('/public/images/rummy/eight_diamonds.png');
 }
 
-.card.diamond-nine {
+.diamond-nine {
     background-image: url('/public/images/rummy/nine_diamonds.png');
 }
 
-.card.diamond-ten {
+.diamond-ten {
     background-image: url('/public/images/rummy/ten_diamonds.png');
 }
 
-.card.diamond-jack {
+.diamond-jack {
     background-image: url('/public/images/rummy/jack_diamonds.png');
 }
 
-.card.diamond-queen {
+.diamond-queen {
     background-image: url('/public/images/rummy/queen_diamonds.png');
 }
 
-.card.diamond-king {
+.diamond-king {
     background-image: url('/public/images/rummy/king_diamonds.png');
 }
 
-.card.spade-ace {
+.spade-ace {
     background-image: url('/public/images/rummy/ace_spades.png');
 }
 
-.card.spade-two {
+.spade-two {
     background-image: url('/public/images/rummy/two_spades.png');
 }
 
-.card.spade-three {
+.spade-three {
     background-image: url('/public/images/rummy/three_spades.png');
 }
 
-.card.spade-four {
+.spade-four {
     background-image: url('/public/images/rummy/four_spades.png');
 }
 
-.card.spade-five {
+.spade-five {
     background-image: url('/public/images/rummy/five_spades.png');
 }
 
-.card.spade-six {
+.spade-six {
     background-image: url('/public/images/rummy/six_spades.png');
 }
 
-.card.spade-seven {
+.spade-seven {
     background-image: url('/public/images/rummy/seven_spades.png');
 }
 
-.card.spade-eight {
+.spade-eight {
     background-image: url('/public/images/rummy/eight_spades.png');
 }
 
-.card.spade-nine {
+.spade-nine {
     background-image: url('/public/images/rummy/nine_spades.png');
 }
 
-.card.spade-ten {
+.spade-ten {
     background-image: url('/public/images/rummy/ten_spades.png');
 }
 
-.card.spade-jack {
+.spade-jack {
     background-image: url('/public/images/rummy/jack_spades.png');
 }
 
-.card.spade-queen {
+.spade-queen {
     background-image: url('/public/images/rummy/queen_spades.png');
 }
 
-.card.spade-king {
+.spade-king {
     background-image: url('/public/images/rummy/king_spades.png');
 }
 
-.card.club-ace {
+.club-ace {
     background-image: url('/public/images/rummy/ace_clubs.png');
 }
 
-.card.club-two {
+.club-two {
     background-image: url('/public/images/rummy/two_clubs.png');
 }
 
-.card.club-three {
+.club-three {
     background-image: url('/public/images/rummy/three_clubs.png');
 }
 
-.card.club-four {
+.club-four {
     background-image: url('/public/images/rummy/four_clubs.png');
 }
 
-.card.club-five {
+.club-five {
     background-image: url('/public/images/rummy/five_clubs.png');
 }
 
-.card.club-six {
+.club-six {
     background-image: url('/public/images/rummy/six_clubs.png');
 }
 
-.card.club-seven {
+.club-seven {
     background-image: url('/public/images/rummy/seven_clubs.png');
 }
 
-.card.club-eight {
+.club-eight {
     background-image: url('/public/images/rummy/eight_clubs.png');
 }
 
-.card.club-nine {
+.club-nine {
     background-image: url('/public/images/rummy/nine_clubs.png');
 }
 
-.card.club-ten {
+.club-ten {
     background-image: url('/public/images/rummy/ten_clubs.png');
 }
 
-.card.club-jack {
+.club-jack {
     background-image: url('/public/images/rummy/jack_clubs.png');
 }
 
-.card.club-queen {
+.club-queen {
     background-image: url('/public/images/rummy/queen_clubs.png');
 }
 
-.card.club-king {
+.club-king {
     background-image: url('/public/images/rummy/king_clubs.png');
 }
 
@@ -582,4 +580,66 @@ button:hover {
         left: 80%;
         transform: translate(-50%, -50%);
     }
+}
+
+.discard-pile {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    top: -80%;
+    left: 45%;
+    cursor: pointer;
+}
+
+.discard-pile:hover .discard-card {
+    border: 1px solid #A1E3F9;
+}
+
+.discard-card {
+    position: absolute;
+    width: 60px;
+    height: 90px;
+    border-radius: 2px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.discard-card:nth-child(1) { transform: rotate(185deg); }
+.discard-card:nth-child(2) { transform: rotate(172deg) translateX(5px); }
+.discard-card:nth-child(3) { transform: rotate(192deg) translateX(-8px); }
+.discard-card:nth-child(4) { transform: rotate(200deg) translateX(-12px); }
+.discard-card:nth-child(5) { transform: rotate(203deg) translateX(-13px); }
+
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.popup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+/* Close button */
+.close-btn {
+    background: red;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 5px;
 }

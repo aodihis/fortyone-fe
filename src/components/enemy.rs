@@ -1,8 +1,7 @@
 use std::rc::Rc;
-use yew::{html, Component, Context, ContextHandle, Html, Properties};
+use yew::{classes, html, Component, Context, ContextHandle, Html, Properties};
 use crate::context::game_state::GameState;
-
-
+use crate::utils::card_class;
 
 #[derive(Clone, PartialEq)]
 pub enum EnemyPos {
@@ -46,7 +45,7 @@ impl Component for Enemy {
             pos,
             name: state.players[index as usize].name.clone(),
             total_cards: state.players[index as usize].hand.len() as u8,
-            bin: vec![],
+            bin: state.players[index as usize].bin.clone(),
             is_turn: state.current_player_index == index as usize,
             _listener,
         }
@@ -72,9 +71,18 @@ impl Component for Enemy {
         };
 
         let items = (0..self.total_cards).collect::<Vec<_>>();
+        let last_five_bin: Vec<_> = self.bin.iter().rev().take(5).clone().collect();
 
         html! {
              <div class={class}>
+               <div class="discard-pile bottom-discard">
+                    {
+                            last_five_bin.iter().map( |x| {
+                                let card_class = card_class(x);
+                                html!{<div class={classes!("discard-card", card_class)}></div>}
+                            }).collect::<Html>()
+                        }
+                </div>
                 <div class="player-area">
                     {
                         items.iter().map(|_| html!{<div class="card card-back"></div>}).collect::<Html>()
