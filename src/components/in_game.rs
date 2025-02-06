@@ -5,7 +5,7 @@ use yew::{function_component, html, Component, Context, ContextHandle, Html, Pro
 use yew::platform::spawn_local;
 use crate::components::current_player::CurrentPlayer;
 use crate::components::enemy::{Enemy, EnemyPos};
-use crate::context::game_state::GameState;
+use crate::context::game_state::{PlayerPhase, GameState};
 
 #[derive(PartialEq)]
 enum Phase {
@@ -60,7 +60,6 @@ impl Component for InGame{
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-
         let total_players = self.total_players;
         let player_index = self.current_player_index;
         let enemies = (0..total_players - 1)
@@ -100,8 +99,6 @@ impl Component for InGame{
                         }
                     }
                 }
-
-
             </>
         }
     }

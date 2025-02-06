@@ -23,7 +23,7 @@ impl Component for CurrentPlayer {
             .expect("context to be set");
 
         Self {
-            name: match state.player_name {
+            name: match state.current_player_name {
                 Some(ref name) => name.clone(),
                 None => String::from(""),
             },
