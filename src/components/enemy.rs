@@ -77,7 +77,7 @@ impl Component for Enemy {
              <div class={class}>
                <div class="discard-pile bottom-discard">
                     {
-                            last_five_bin.iter().map( |x| {
+                            last_five_bin.iter().rev().map( |x| {
                                 let card_class = card_class(x);
                                 html!{<div class={classes!("discard-card", card_class)}></div>}
                             }).collect::<Html>()
