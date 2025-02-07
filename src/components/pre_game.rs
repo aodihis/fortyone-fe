@@ -1,17 +1,16 @@
+use crate::context::game_state::GameState;
+use gloo_timers::future::TimeoutFuture;
 use std::rc::Rc;
 use web_sys::wasm_bindgen::JsCast;
 use web_sys::window;
-use yew::{function_component, html, use_context, use_state, Callback, Html, Properties, SubmitEvent};
 use yew::platform::spawn_local;
-use crate::context::game_state::GameState;
-use crate::context::players::Player;
-use gloo_timers::future::TimeoutFuture;
+use yew::{function_component, html, use_context, use_state, Callback, Html, Properties, SubmitEvent};
 
 #[derive(Clone, PartialEq)]
 enum PreGamePhase {
     Home,
     Waiting,
-    Join,
+    _Join,
     Create
 }
 
@@ -26,10 +25,10 @@ pub struct PreGameProps {
 
 }
 #[function_component]
-pub fn PreGame(props: &PreGameProps) -> Html {
+pub fn PreGame(_: &PreGameProps) -> Html {
 
     let phase = use_state(|| PreGamePhase::Home);
-    let game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
+    let _game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
 
     let onclick = {
         let phase = phase.clone();
@@ -111,7 +110,7 @@ pub fn CreateGame() -> Html {
         let target = e.target();
         let form = target.and_then(|t| t.dyn_into::<web_sys::HtmlFormElement>().ok()).expect("Couldn't get HtmlFormElement");
         let name_element = form.get_with_name("name").and_then(|name| name.dyn_into::<web_sys::HtmlInputElement>().ok()).unwrap();
-        let name = name_element.value();
+        let _name = name_element.value();
 
     });
 

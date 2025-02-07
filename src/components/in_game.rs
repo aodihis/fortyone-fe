@@ -1,11 +1,10 @@
-use std::rc::Rc;
-use std::sync::mpsc::SendError;
-use gloo_timers::future::TimeoutFuture;
-use yew::{function_component, html, Component, Context, ContextHandle, Html, Properties};
-use yew::platform::spawn_local;
 use crate::components::current_player::CurrentPlayer;
 use crate::components::enemy::{Enemy, EnemyPos};
-use crate::context::game_state::{PlayerPhase, GameState};
+use crate::context::game_state::GameState;
+use gloo_timers::future::TimeoutFuture;
+use std::rc::Rc;
+use yew::platform::spawn_local;
+use yew::{function_component, html, Callback, Component, Context, ContextHandle, Html, Properties};
 
 #[derive(PartialEq)]
 enum Phase {
@@ -16,6 +15,7 @@ enum Phase {
 pub enum Msg {
     StateChanged(Rc<GameState>),
     PhaseChanged(Phase),
+    CardBinShow(Option<usize>)
 }
 pub struct InGame{
     phase: Phase,
@@ -56,12 +56,19 @@ impl Component for InGame{
                 self.phase = phase;
                 true
             }
+            Msg::CardBinShow(_) => {
+
+                true
+            }
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let total_players = self.total_players;
         let player_index = self.current_player_index;
+
+        let card_bin_show = ctx.link().callback(Msg::CardBinShow);
+
         let enemies = (0..total_players - 1)
             .map(|i| {
                 let pos = match i {
@@ -69,10 +76,13 @@ impl Component for InGame{
                     1 => EnemyPos::Right,
                     _ => EnemyPos::Left,
                 };
-
+                let callback = {
+                    let card_bin_show = card_bin_show.clone();
+                    Callback::from(move |index: usize| {
+                    card_bin_show.emit(Some(index));
+                })};
                 let adjusted_index = if player_index > i as usize { i } else { i + 1 };
-
-                html! { <Enemy index={adjusted_index} pos={pos} /> }
+                html! { <Enemy index={adjusted_index} pos={pos} on_bin_click={callback}/> }
             }).collect::<Vec<Html>>();
 
         if self.phase == Phase::Dealing {
@@ -86,6 +96,7 @@ impl Component for InGame{
 
         html! {
             <>
+
                 <Deck total_cards={self.card_left}/>
                 {
                     if self.phase == Phase::Dealing {
@@ -145,5 +156,24 @@ pub fn CardDistribution(props: &CardDistributionProps) -> Html {
                 }).collect::<Html>()
             }
         </>
+    }
+}
+
+#[derive(Properties, Clone, PartialEq)]
+pub struct CardBinShowCaseProps {
+    pub onclose: Callback<()>,
+    pub bin_index: usize,
+}
+
+#[function_component]
+pub fn CardBinShowCase(props: &CardBinShowCaseProps) -> Html {
+    let onclose = props.onclose.clone().emit(());
+    let cards = props.bin_index.clone();
+    html!{
+         <div class="popup-overlay" id="popup">
+            <div class="popup-container">
+                <button class="close-button" onclick={move |_| onclose}>{"x"}</button>
+            </div>
+        </div>
     }
 }

@@ -13,7 +13,7 @@ impl Component for Game {
     type Message = ();
     type Properties = ();
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         let dummy_players = vec![Player{
             name: "P1".to_string(),
             score: 0,
@@ -44,7 +44,7 @@ impl Component for Game {
             player_turn_phase: PlayerPhase::P1,
             current_player_name: Some(String::from("Mia")),
             players: dummy_players,
-            event: None,
+            _event: None,
             counter: 0,
         });
 
@@ -53,7 +53,7 @@ impl Component for Game {
         }
     }
 
-    fn view(&self, ctx: &Context<Self>) -> Html {
+    fn view(&self, _ctx: &Context<Self>) -> Html {
 
         let game_state = self.game_state.clone();
 

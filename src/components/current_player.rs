@@ -1,7 +1,9 @@
 use std::rc::Rc;
+use rand::Rng;
 use yew::{classes, html, Component, Context, ContextHandle, Html};
 use crate::context::game_state::{GameState, PlayerPhase};
 use crate::utils::card_class;
+
 pub enum Msg {
     StateChanged(Rc<GameState>),
 }
@@ -45,7 +47,7 @@ impl Component for CurrentPlayer {
         }
     }
 
-    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, _: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::StateChanged(state) => {
                 let is_turn = state.player_turn_index == state.current_player_index;
@@ -65,16 +67,23 @@ impl Component for CurrentPlayer {
         }
     }
 
-    fn view(&self, ctx: &Context<Self>) -> Html {
+    fn view(&self, _ctx: &Context<Self>) -> Html {
         let last_five_bin: Vec<_> = self.bin.iter().rev().take(5).clone().collect();
         html!{
             <>
                 <div class="current-player">
                     <div class="discard-pile bottom-discard">
                         {
-                            last_five_bin.iter().rev().map( |x| {
+                            last_five_bin.iter().rev().map(|x| {
                                 let card_class = card_class(x);
-                                html!{<div class={classes!("discard-card", card_class)}></div>}
+                                let mut rng = rand::thread_rng();
+                                let rotate = rng.gen_range(160..=200);
+                                let translate_x = rng.gen_range(-10..=10);
+                                let style = format!("transform: rotate({}deg) translateX({}px);", rotate, translate_x);
+
+                                html! {
+                                    <div class={classes!("discard-card", card_class)} style={style}></div>
+                                }
                             }).collect::<Html>()
                         }
                     </div>

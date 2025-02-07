@@ -1,7 +1,8 @@
 use std::rc::Rc;
-use yew::{classes, html, Component, Context, ContextHandle, Html, Properties};
 use crate::context::game_state::GameState;
 use crate::utils::card_class;
+use rand::Rng;
+use yew::{classes, html, Callback, Component, Context, ContextHandle, Html, Properties};
 
 #[derive(Clone, PartialEq)]
 pub enum EnemyPos {
@@ -19,6 +20,7 @@ pub enum Msg {
 pub struct EnemyProps {
     pub index: u8,
     pub pos: EnemyPos,
+    pub on_bin_click : Callback<usize>,
 }
 pub struct Enemy {
     index: u8,
@@ -72,16 +74,23 @@ impl Component for Enemy {
 
         let items = (0..self.total_cards).collect::<Vec<_>>();
         let last_five_bin: Vec<_> = self.bin.iter().rev().take(5).clone().collect();
-
+        let bin_click = ctx.props().on_bin_click.emit(self.index as usize);
         html! {
              <div class={class}>
-               <div class="discard-pile bottom-discard">
+               <div class="discard-pile bottom-discard" onclick={move |_| bin_click}>
                     {
-                            last_five_bin.iter().rev().map( |x| {
+                            last_five_bin.iter().rev().map(|x| {
                                 let card_class = card_class(x);
-                                html!{<div class={classes!("discard-card", card_class)}></div>}
+                                let mut rng = rand::thread_rng();
+                                let rotate = rng.gen_range(160..=200);
+                                let translate_x = rng.gen_range(-10..=10);
+                                let style = format!("transform: rotate({}deg) translateX({}px);", rotate, translate_x);
+
+                                html! {
+                                    <div class={classes!("discard-card", card_class)} style={style}></div>
+                                }
                             }).collect::<Html>()
-                        }
+                    }
                 </div>
                 <div class="player-area">
                     {

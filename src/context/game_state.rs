@@ -1,6 +1,5 @@
-use serde::{Deserialize, Serialize};
-use yew::Callback;
 use crate::context::players::Player;
+use serde::{Deserialize, Serialize};
 
 
 #[derive(Debug,Clone, Serialize, Deserialize, PartialEq)]
@@ -12,24 +11,24 @@ pub enum PlayerPhase {
 }
 #[derive(Clone)]
 pub enum InGameMovement {
-    Draw,
-    Discard,
-    TakeBin,
-    Close
+    _Draw,
+    _Discard,
+    _TakeBin,
+    _Close
 }
 
 #[derive(Clone)]
 pub struct InGameEvent {
     pub _movement: Option<InGameMovement>,
-    from: Option<Player>,
-    to: Option<Player>,
+    _from: Option<Player>,
+    _to: Option<Player>,
 }
 
 #[derive(Clone, PartialEq)]
 pub enum GameStatus {
     PreGame,
     InProgress,
-    PostGame,
+    _PostGame,
 }
 
 #[derive(Clone)]
@@ -42,7 +41,7 @@ pub struct GameState {
     pub player_turn_index: usize, // the turn index
     pub player_turn_phase: PlayerPhase,
     pub players: Vec<Player>,
-    pub event: Option<InGameEvent>,
+    pub _event: Option<InGameEvent>,
     pub counter: usize,
     // pub join: Callback<String>,
     // pub create_game: Callback<()>,
