@@ -78,7 +78,7 @@ impl Component for InGame{
 
                 web_sys::console::log_1(&index.into());
                 link.send_message(Msg::CardBinShow(Some(index)));
-            })};
+        })};
 
         let enemies = (0..total_players - 1)
             .map(|i| {
@@ -121,7 +121,7 @@ impl Component for InGame{
                         html!{
                             <>
                                 {for enemies}
-                                <CurrentPlayer />
+                                <CurrentPlayer on_bin_click={on_bin_click} />
                             </>
                         }
                     }

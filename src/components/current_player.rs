@@ -1,12 +1,17 @@
 use crate::context::game_state::{GameState, PlayerPhase};
 use crate::utils::card_class;
 use std::rc::Rc;
-use yew::{classes, html, Component, Context, ContextHandle, Html};
+use yew::{classes, html, Callback, Component, Context, ContextHandle, Html, Properties};
 
+#[derive(Clone, PartialEq, Properties)]
+pub struct CurrentPlayerProps {
+    pub on_bin_click : Callback<usize>,
+}
 pub enum Msg {
     StateChanged(Rc<GameState>),
 }
 pub struct CurrentPlayer {
+    index: usize,
     is_turn: bool,
     player_phase: PlayerPhase,
     name: String,
@@ -18,7 +23,7 @@ pub struct CurrentPlayer {
 
 impl Component for CurrentPlayer {
     type Message = Msg;
-    type Properties = ();
+    type Properties = CurrentPlayerProps;
 
     fn create(ctx: &Context<Self>) -> Self {
         let (state, _listener) = ctx.link()
@@ -27,6 +32,7 @@ impl Component for CurrentPlayer {
 
         let is_turn = state.player_turn_index == state.current_player_index;
         Self {
+            index: state.current_player_index,
             is_turn,
             player_phase: {
                 if is_turn {
@@ -66,12 +72,17 @@ impl Component for CurrentPlayer {
         }
     }
 
-    fn view(&self, _ctx: &Context<Self>) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
         let last_five_bin: Vec<_> = self.bin.iter().rev().take(5).clone().collect();
+        let bin_click = {
+            let index = self.index;
+            ctx.props().on_bin_click.reform(move |_| index)
+        };
+
         html!{
             <>
                 <div class="current-player">
-                    <div class="discard-pile bottom-discard">
+                    <div class="discard-pile bottom-discard" onclick={bin_click}>
                         {
                             last_five_bin.iter().rev().map(|x| {
                                 let card_class = card_class(x);
