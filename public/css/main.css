@@ -597,9 +597,28 @@ button:hover {
     cursor: pointer;
 }
 
+.current-player .discard-pile {
+    left: 10%
+}
+
 .discard-pile:hover .discard-card {
     border: 1px solid #A1E3F9;
 }
+
+.game-info {
+    position: absolute;
+    top: -80%;
+    left: 35%;
+    width: 200px;
+    height: 80px;
+    border: 1px solid var(--d-color);
+    background-color: var(--c-color);
+    color: var(--n-color);
+    display: flex;
+    align-items: center; /* Vertically center */
+    justify-content: center;
+}
+
 
 .discard-card {
     position: absolute;

@@ -92,7 +92,17 @@ impl Component for CurrentPlayer {
                             }).collect::<Html>()
                         }
                     </div>
-
+                    <div class="game-info">
+                        <p>{
+                            if !self.is_turn {
+                                html!{"Waiting other player turn!"}
+                            } else if self.player_phase == PlayerPhase::P1 {
+                                html!{"Your turn to draw or take from bin!"}
+                            } else {
+                                html!{"Remove card from your hand!"}
+                            }
+                        }</p>
+                    </div>
                     <div class="player-area">
                         {
                             self.hand.iter().map(|h| {
