@@ -619,6 +619,10 @@ button:hover {
     justify-content: center;
 }
 
+.game-info p {
+    margin: 0;
+    font-size: 0.8rem;
+}
 
 .discard-card {
     position: absolute;

@@ -1,6 +1,7 @@
 use crate::context::game_state::{GameState, PlayerPhase};
 use crate::utils::card_class;
 use std::rc::Rc;
+use web_sys::MouseEvent;
 use yew::{classes, html, Callback, Component, Context, ContextHandle, Html, Properties};
 
 #[derive(Clone, PartialEq, Properties)]
@@ -79,10 +80,26 @@ impl Component for CurrentPlayer {
             ctx.props().on_bin_click.reform(move |_| index)
         };
 
+        let is_draw_phase = self.is_turn && self.player_phase == PlayerPhase::P1;
+        let is_discard_phase = self.is_turn && self.player_phase == PlayerPhase::P2;
+        let on_take_bin = Callback::from(move |event: MouseEvent| {
+            event.prevent_default();
+            if is_draw_phase {
+
+            }
+        });
+
+        let on_discard = Callback::from(move |event: MouseEvent| {
+            event.prevent_default();
+            if is_draw_phase {
+
+            }
+        });
+
         html!{
             <>
                 <div class="current-player">
-                    <div class="discard-pile bottom-discard" onclick={bin_click}>
+                    <div class="discard-pile bottom-discard" onclick={bin_click} oncontextmenu={on_take_bin}>
                         {
                             last_five_bin.iter().rev().map(|x| {
                                 let card_class = card_class(x);
@@ -93,22 +110,23 @@ impl Component for CurrentPlayer {
                         }
                     </div>
                     <div class="game-info">
-                        <p>{
+                        {
                             if !self.is_turn {
-                                html!{"Waiting other player turn!"}
+                                html! { "Waiting for the other player's turn!" }
                             } else if self.player_phase == PlayerPhase::P1 {
-                                html!{"Your turn to draw or take from bin!"}
+                                html! { <div><p>{ "Your turn to draw or take from the bin!" }</p><p>{"Click on deck or right click on bin"}</p></div> }
                             } else {
-                                html!{"Remove card from your hand!"}
+                                html!{ <div><p>{ "Remove a card from your hand!" }</p><p>{"Left click on card to discard or right click to end"}</p></div> }
+
                             }
-                        }</p>
+                        }
                     </div>
                     <div class="player-area">
                         {
                             self.hand.iter().map(|h| {
                                 let card_class = card_class(h);
                                 html!{
-                                    <div class={classes!("card", card_class)}></div>
+                                    <div class={classes!("card", card_class)} oncontextmenu={on_discard.clone()}></div>
                                 }
                             }).collect::<Html>()
                         }
