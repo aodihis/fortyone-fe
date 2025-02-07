@@ -1,3 +1,9 @@
+:root {
+    --c-color: #754E1A; /* Bright mint green */
+    --n-color: #F8E1B7; /* Dark green text */
+    --d-color: #CBA35C;
+    --m-color: #007B43
+}
 body {
     font-family: sans-serif;
     text-align: center;
@@ -7,9 +13,9 @@ body {
 button {
     cursor: pointer;
     display: block;
-    background-color: #754E1A; /* Bright mint green */
-    color: #F8E1B7; /* Dark green text */
-    border: 2px solid #CBA35C;
+    background-color: var(--c-color); /* Bright mint green */
+    color: var(--n-color); /* Dark green text */
+    border: 2px solid var(--d-color);
     padding: 10px 20px;
     border-radius: 5px;
     font-weight: bold;
@@ -18,7 +24,7 @@ button {
 
 button:hover {
     background-color: white;
-    color: #754E1A;
+    color: var(--c-color);
     border-color: white;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
@@ -51,9 +57,9 @@ button:hover {
     display: block;
     width: 10rem;
     height: 4rem;
-    background-color: #754E1A; /* Bright mint green */
-    color: #F8E1B7; /* Dark green text */
-    border: 2px solid #CBA35C;
+    background-color: var(--c-color); /* Bright mint green */
+    color: var(--n-color); /* Dark green text */
+    border: 2px solid var(--d-color);
     padding: 10px 20px;
     border-radius: 5px;
     font-weight: bold;
@@ -62,7 +68,7 @@ button:hover {
 
 .pre-game .options button:hover {
     background-color: white;
-    color: #754E1A;
+    color: var(--c-color);
     border-color: white;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
@@ -84,7 +90,7 @@ button:hover {
 .pre-game .waiting-game .wg-players{
     height: 9rem;
     width: 100%;
-    border: 1px solid #CBA35C;
+    border: 1px solid var(--d-color);
     font-weight: lighter;
     font-size: 1.2rem;
     margin-bottom: 1rem;
@@ -182,7 +188,7 @@ button:hover {
     width: 100%;
     height: 100vh;
 //margin: 5vh auto;
-    background-color: #007B43;
+    background-color: var(--m-color);
 //background-color: lightblue;
 //border-radius: 16px;
     padding: 0;
@@ -605,20 +611,39 @@ button:hover {
     background-repeat: no-repeat;
 }
 
-.discard-card:nth-child(1) { transform: rotate(185deg); }
-.discard-card:nth-child(2) { transform: rotate(172deg) translateX(5px); }
-.discard-card:nth-child(3) { transform: rotate(192deg) translateX(-8px); }
-.discard-card:nth-child(4) { transform: rotate(200deg) translateX(-12px); }
-.discard-card:nth-child(5) { transform: rotate(203deg) translateX(-13px); }
+.top-enemy .discard-card:nth-child(1) { transform: rotate(185deg); }
+.top-enemy .discard-card:nth-child(2) { transform: rotate(172deg) translateX(5px); }
+.top-enemy .discard-card:nth-child(3) { transform: rotate(192deg) translateX(-8px); }
+.top-enemy .discard-card:nth-child(4) { transform: rotate(200deg) translateX(-12px); }
+.top-enemy .discard-card:nth-child(5) { transform: rotate(203deg) translateX(-13px); }
+
+.left-enemy .discard-card:nth-child(1) { transform: rotate(185deg); }
+.left-enemy .discard-card:nth-child(2) { transform: rotate(12deg) translateX(5px); }
+.left-enemy .discard-card:nth-child(3) { transform: rotate(222deg) translateX(-8px); }
+.left-enemy .discard-card:nth-child(4) { transform: rotate(150deg) translateX(-12px); }
+.left-enemy .discard-card:nth-child(5) { transform: rotate(203deg) translateX(10px); }
+
+.right-enemy .discard-card:nth-child(1) { transform: rotate(100deg); }
+.right-enemy .discard-card:nth-child(2) { transform: rotate(130deg) translateX(5px); }
+.right-enemy .discard-card:nth-child(3) { transform: rotate(192deg) translateX(-8px); }
+.right-enemy .discard-card:nth-child(4) { transform: rotate(200deg) translateX(-12px); }
+.right-enemy .discard-card:nth-child(5) { transform: rotate(203deg) translateX(-13px); }
+
+.current-player .discard-card:nth-child(1) { transform: rotate(177deg); }
+.current-player .discard-card:nth-child(2) { transform: rotate(190deg) translateX(5px); }
+.current-player-enemy .discard-card:nth-child(3) { transform: rotate(145deg) translateX(-8px); }
+.current-player .discard-card:nth-child(4) { transform: rotate(220deg) translateX(10px); }
+.current-player .discard-card:nth-child(5) { transform: rotate(203deg) translateX(-13px); }
+
 
 .overlay {
-    display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
+    z-index: 100;
 }
 
 .card-popup-container {
@@ -626,22 +651,50 @@ button:hover {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: white;
+    background: var(--d-color);
+    border: 7px solid var(--c-color);
     padding: 20px;
     border-radius: 8px;
     width: 90%;
     max-width: 800px;
-    max-height: 80vh;
-    z-index: 1001;
+    height: 150px;
+    z-index: 100;
 }
 
 .card-popup-close-button {
+    padding: 0;
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
+    display: block;
+    top: -12px;
+    right: -12px;
+    background: red;
+    color: white;
     border: none;
-    font-size: 24px;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
     cursor: pointer;
-    color: #333;
+}
+
+.card-list-container {
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+    padding: 20px 0;
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
+}
+
+.card-list-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.card-list-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.card-list-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
 }

@@ -74,20 +74,18 @@ impl Component for Enemy {
 
         let items = (0..self.total_cards).collect::<Vec<_>>();
         let last_five_bin: Vec<_> = self.bin.iter().rev().take(5).clone().collect();
-        let bin_click = ctx.props().on_bin_click.emit(self.index as usize);
+        let bin_click = {
+            let index = self.index;
+            ctx.props().on_bin_click.reform(move |_| index as usize)
+        };
         html! {
              <div class={class}>
-               <div class="discard-pile bottom-discard" onclick={move |_| bin_click}>
+               <div class="discard-pile bottom-discard" onclick={bin_click}>
                     {
                             last_five_bin.iter().rev().map(|x| {
                                 let card_class = card_class(x);
-                                let mut rng = rand::thread_rng();
-                                let rotate = rng.gen_range(160..=200);
-                                let translate_x = rng.gen_range(-10..=10);
-                                let style = format!("transform: rotate({}deg) translateX({}px);", rotate, translate_x);
-
                                 html! {
-                                    <div class={classes!("discard-card", card_class)} style={style}></div>
+                                    <div class={classes!("discard-card", card_class)} ></div>
                                 }
                             }).collect::<Html>()
                     }

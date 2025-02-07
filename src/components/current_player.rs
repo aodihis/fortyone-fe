@@ -1,8 +1,7 @@
-use std::rc::Rc;
-use rand::Rng;
-use yew::{classes, html, Component, Context, ContextHandle, Html};
 use crate::context::game_state::{GameState, PlayerPhase};
 use crate::utils::card_class;
+use std::rc::Rc;
+use yew::{classes, html, Component, Context, ContextHandle, Html};
 
 pub enum Msg {
     StateChanged(Rc<GameState>),
@@ -76,13 +75,8 @@ impl Component for CurrentPlayer {
                         {
                             last_five_bin.iter().rev().map(|x| {
                                 let card_class = card_class(x);
-                                let mut rng = rand::thread_rng();
-                                let rotate = rng.gen_range(160..=200);
-                                let translate_x = rng.gen_range(-10..=10);
-                                let style = format!("transform: rotate({}deg) translateX({}px);", rotate, translate_x);
-
                                 html! {
-                                    <div class={classes!("discard-card", card_class)} style={style}></div>
+                                    <div class={classes!("discard-card", card_class)}></div>
                                 }
                             }).collect::<Html>()
                         }

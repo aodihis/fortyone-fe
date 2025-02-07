@@ -4,7 +4,8 @@ use crate::context::game_state::GameState;
 use gloo_timers::future::TimeoutFuture;
 use std::rc::Rc;
 use yew::platform::spawn_local;
-use yew::{function_component, html, Callback, Component, Context, ContextHandle, Html, Properties};
+use yew::{classes, function_component, html, use_context, Callback, Component, Context, ContextHandle, Html, Properties};
+use crate::utils::card_class;
 
 #[derive(PartialEq)]
 enum Phase {
@@ -18,6 +19,7 @@ pub enum Msg {
     CardBinShow(Option<usize>)
 }
 pub struct InGame{
+    bin_index: Option<usize>,
     phase: Phase,
     total_players: u8,
     card_left: u8,
@@ -36,6 +38,7 @@ impl Component for InGame{
             .expect("context to be set");
 
         Self {
+            bin_index: None,
             phase: Phase::Sorting,
             total_players: state.players.len() as u8,
             current_player_index: state.current_player_index,
@@ -56,8 +59,8 @@ impl Component for InGame{
                 self.phase = phase;
                 true
             }
-            Msg::CardBinShow(_) => {
-
+            Msg::CardBinShow(index) => {
+                self.bin_index = index;
                 true
             }
         }
@@ -67,7 +70,15 @@ impl Component for InGame{
         let total_players = self.total_players;
         let player_index = self.current_player_index;
 
-        let card_bin_show = ctx.link().callback(Msg::CardBinShow);
+        let link = ctx.link().clone();
+
+        let on_bin_click = {
+            let link = link.clone();
+            Callback::from(move |index: usize| {
+
+                web_sys::console::log_1(&index.into());
+                link.send_message(Msg::CardBinShow(Some(index)));
+            })};
 
         let enemies = (0..total_players - 1)
             .map(|i| {
@@ -76,17 +87,13 @@ impl Component for InGame{
                     1 => EnemyPos::Right,
                     _ => EnemyPos::Left,
                 };
-                let callback = {
-                    let card_bin_show = card_bin_show.clone();
-                    Callback::from(move |index: usize| {
-                    card_bin_show.emit(Some(index));
-                })};
+
                 let adjusted_index = if player_index > i as usize { i } else { i + 1 };
-                html! { <Enemy index={adjusted_index} pos={pos} on_bin_click={callback}/> }
+                html! { <Enemy index={adjusted_index} pos={pos} on_bin_click={on_bin_click.clone()}/> }
             }).collect::<Vec<Html>>();
 
         if self.phase == Phase::Dealing {
-            let link = ctx.link().clone();
+            let link = link.clone();
             let time = self.total_players as u32 * 4 * 1000;
             spawn_local( async move {
                 TimeoutFuture::new(time).await;
@@ -94,9 +101,18 @@ impl Component for InGame{
             });
         }
 
+        let onclose_bin = Callback::from(move |_| {
+            link.send_message(Msg::CardBinShow(None));
+        });
         html! {
             <>
-
+                {
+                    if self.bin_index.is_some() {
+                        html!{<CardBinShowCase onclose={onclose_bin} bin_index={self.bin_index.unwrap()}/>}
+                    } else {
+                        html!{}
+                    }
+                }
                 <Deck total_cards={self.card_left}/>
                 {
                     if self.phase == Phase::Dealing {
@@ -167,12 +183,31 @@ pub struct CardBinShowCaseProps {
 
 #[function_component]
 pub fn CardBinShowCase(props: &CardBinShowCaseProps) -> Html {
-    let onclose = props.onclose.clone().emit(());
-    let cards = props.bin_index.clone();
+
+    let game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
+
+    let onclose = {
+        let cb = props.onclose.clone();
+        Callback::from(move |_| {
+            cb.emit(())
+        })
+    };
+
+    let bin_index = props.bin_index;
+    let cards = game_state.players[bin_index].bin.iter().rev().map(|card| {
+        let class = card_class(card);
+        html!{
+            <div class={classes!("card", class)}></div>
+        }
+    }).collect::<Vec<Html>>();
+
     html!{
-         <div class="popup-overlay" id="popup">
-            <div class="popup-container">
-                <button class="close-button" onclick={move |_| onclose}>{"x"}</button>
+         <div class="overlay" id="popup">
+            <div class="card-popup-container">
+                <button class="card-popup-close-button" onclick={onclose}>{"x"}</button>
+                <div class="card-list-container">
+                    { for cards }
+                </div>
             </div>
         </div>
     }
