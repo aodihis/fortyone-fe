@@ -202,6 +202,7 @@ button:hover {
     transform: translate(-50%, -50%);
     width: 75px;
     height: 105px;
+    cursor: pointer;
 }
 
 .card {

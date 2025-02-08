@@ -1,6 +1,6 @@
 use crate::components::current_player::CurrentPlayer;
 use crate::components::enemy::{Enemy, EnemyPos};
-use crate::context::game_state::GameState;
+use crate::context::game_state::{GameState, PlayerPhase};
 use gloo_timers::future::TimeoutFuture;
 use std::rc::Rc;
 use yew::platform::spawn_local;
@@ -21,9 +21,11 @@ pub enum Msg {
 pub struct InGame{
     bin_index: Option<usize>,
     phase: Phase,
+    player_phase: PlayerPhase,
     total_players: u8,
     card_left: u8,
     current_player_index: usize,
+    player_turn_index: usize,
     _listener: ContextHandle<Rc<GameState>>
 }
 
@@ -38,10 +40,12 @@ impl Component for InGame{
             .expect("context to be set");
 
         Self {
+            player_phase: state.player_turn_phase.clone(),
             bin_index: None,
             phase: Phase::Sorting,
             total_players: state.players.len() as u8,
             current_player_index: state.current_player_index,
+            player_turn_index: state.player_turn_index,
             card_left: state.card_left,
             _listener,
         }
@@ -104,6 +108,14 @@ impl Component for InGame{
         let onclose_bin = Callback::from(move |_| {
             link.send_message(Msg::CardBinShow(None));
         });
+
+        let on_draw = {
+            let is_player_draw = self.player_turn_index == self.current_player_index && self.player_phase == PlayerPhase::P1;
+            Callback::from(move |_| {
+                if is_player_draw {}
+            })
+        };
+
         html! {
             <>
                 {
@@ -113,7 +125,7 @@ impl Component for InGame{
                         html!{}
                     }
                 }
-                <Deck total_cards={self.card_left}/>
+                <Deck total_cards={self.card_left} on_draw={on_draw}/>
                 {
                     if self.phase == Phase::Dealing {
                         html!{<CardDistribution total_players={total_players}/>}
@@ -134,6 +146,7 @@ impl Component for InGame{
 #[derive(Properties, Clone, PartialEq)]
 pub struct DeckProps {
     pub total_cards: u8,
+    pub on_draw: Callback<()>
 }
 #[function_component]
 pub fn Deck(props: &DeckProps) -> Html {
@@ -145,8 +158,9 @@ pub fn Deck(props: &DeckProps) -> Html {
                 </div>
             }
         }).collect::<Vec<Html>>();
+    let on_click = props.on_draw.reform(|_|());
     html! {
-        <div class="deck">
+        <div class="deck" onclick={on_click}>
             { for cards }
         </div>
     }
