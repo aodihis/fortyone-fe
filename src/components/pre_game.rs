@@ -10,7 +10,7 @@ use yew::{function_component, html, use_context, use_state, Callback, Html, Prop
 enum PreGamePhase {
     Home,
     Waiting,
-    _Join,
+    Join,
     Create
 }
 
@@ -35,9 +35,9 @@ pub fn PreGame(_: &PreGameProps) -> Html {
         move |action: Action| {
             Callback::from(move |_| {
                 if action == Action::Join {
-                    phase.set(PreGamePhase::Waiting);
+                    phase.set(PreGamePhase::Join);
                 } else {
-                    phase.set(PreGamePhase::Waiting);
+                    phase.set(PreGamePhase::Create);
                 }
             })
         }
@@ -104,15 +104,29 @@ pub fn JoinGame() -> Html {
 
 #[function_component]
 pub fn CreateGame() -> Html {
-
-    let onsubmit = Callback::from(move |e: SubmitEvent| {
-        e.prevent_default();
-        let target = e.target();
-        let form = target.and_then(|t| t.dyn_into::<web_sys::HtmlFormElement>().ok()).expect("Couldn't get HtmlFormElement");
-        let name_element = form.get_with_name("name").and_then(|name| name.dyn_into::<web_sys::HtmlInputElement>().ok()).unwrap();
-        let _name = name_element.value();
-
-    });
+    web_sys::console::log_1(&"CreateGame".into());
+    let game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
+    let onsubmit = {
+        let game_state = game_state.clone();
+        Callback::from(move |e: SubmitEvent| {
+            e.prevent_default();
+            let target = e.target();
+            let form = target.and_then(|t| t.dyn_into::<web_sys::HtmlFormElement>().ok()).expect("Couldn't get HtmlFormElement");
+            let name_element = form.get_with_name("name").and_then(|name| name.dyn_into::<web_sys::HtmlInputElement>().ok()).unwrap();
+            let _name = name_element.value();
+            let mut game_state =game_state.clone();
+            spawn_local(async move {
+                match Rc::make_mut(&mut game_state).connect().await {
+                    true => {
+                        web_sys::console::log_1(&"connect".into());
+                    }
+                    false => {
+                        window().unwrap().alert_with_message("Failed to connect!").unwrap();
+                    }
+                }
+            });
+        })
+    };
 
     html! {
         <div class="game-form">

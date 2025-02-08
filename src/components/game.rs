@@ -36,7 +36,7 @@ impl Component for Game {
             hand: vec!["".to_string(),"".to_string(),"".to_string(),"".to_string()],
         }];
         let game_state = Rc::new(GameState {
-            game_status: GameStatus::InProgress,
+            game_status: GameStatus::PreGame,
             game_id: None,
             card_left: 52,
             current_player_index: 0,
