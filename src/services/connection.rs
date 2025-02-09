@@ -10,6 +10,7 @@ pub async fn create_game() -> Result<String, GameError> {
     let api_url: &str = API_URL;
     web_sys::console::log_1(&api_url.into());
 
+    return Ok("test".to_string());
     let response = Request::get(&format!("{}/create", api_url)).send().await;
 
 

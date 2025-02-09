@@ -1,10 +1,10 @@
 use crate::context::game_state::GameState;
 use gloo_timers::future::TimeoutFuture;
-use std::rc::Rc;
+use web_sys::console::log_1;
 use web_sys::wasm_bindgen::JsCast;
 use web_sys::window;
 use yew::platform::spawn_local;
-use yew::{function_component, html, use_context, use_state, Callback, Html, Properties, SubmitEvent};
+use yew::{function_component, html, props, use_context, use_state, Callback, Html, Properties, SubmitEvent};
 
 #[derive(Clone, PartialEq)]
 enum PreGamePhase {
@@ -49,6 +49,11 @@ pub fn PreGame(_: &PreGameProps) -> Html {
     };
     let create_onclick = onclick(Action::Create);
 
+    let create_callback = {
+        let phase = phase.clone();
+        Callback::from(move |_| {
+            phase.set(PreGamePhase::Waiting);
+    })};
     html! {
         <div class="pre-game">
             {
@@ -62,7 +67,7 @@ pub fn PreGame(_: &PreGameProps) -> Html {
                 } else if *phase == PreGamePhase::Waiting {
                     html!(<WaitingGame/>)
                 } else if *phase == PreGamePhase::Create {
-                    html!(<CreateGame/>)
+                    html!(<CreateGame callback={create_callback}/>)
                 } else{
                     html!(<JoinGame/>)
                 }
@@ -73,7 +78,7 @@ pub fn PreGame(_: &PreGameProps) -> Html {
 
 #[function_component]
 pub fn JoinGame() -> Html {
-
+    log_1(&"join".into());
     let onsubmit = Callback::from(move |e: SubmitEvent| {
         e.prevent_default();
         let target = e.target();
@@ -102,10 +107,15 @@ pub fn JoinGame() -> Html {
     }
 }
 
+#[derive(Properties, PartialEq, Clone)]
+pub struct CreateGameProps {
+    callback: Callback<()>,
+}
 #[function_component]
-pub fn CreateGame() -> Html {
+pub fn CreateGame(props: &CreateGameProps) -> Html {
     web_sys::console::log_1(&"CreateGame".into());
     let game_state: GameState = use_context::<GameState>().unwrap();
+    let callback = props.callback.clone();
     let onsubmit = {
         let game_state = game_state.clone();
         Callback::from(move |e: SubmitEvent| {
@@ -114,13 +124,17 @@ pub fn CreateGame() -> Html {
             let form = target.and_then(|t| t.dyn_into::<web_sys::HtmlFormElement>().ok()).expect("Couldn't get HtmlFormElement");
             let name_element = form.get_with_name("name").and_then(|name| name.dyn_into::<web_sys::HtmlInputElement>().ok()).unwrap();
             let _name = name_element.value();
-            // let mut game_state =game_state.clone();
-            // spawn_local(async move {
-            //     match Rc::make_mut(&mut game_state).create_game().await {
-            //         Ok(_) => {web_sys::console::log_1(&"connect".into());}
-            //         Err(_) => {window().unwrap().alert_with_message("Failed to connect!").unwrap();}
-            //     }
-            // });
+            let mut game_state = game_state.clone();
+            let callback = callback.clone();
+            spawn_local(async move {
+                match game_state.create_game().await {
+                    Ok(_) => {
+                        log_1(&"connect".into());
+                        callback.emit(());
+                    }
+                    Err(_) => {window().unwrap().alert_with_message("Failed to connect!").unwrap();}
+                }
+            });
         })
     };
 
@@ -136,6 +150,7 @@ pub fn CreateGame() -> Html {
 
 #[function_component]
 pub fn WaitingGame() -> Html {
+    log_1(&"waiting".into());
     let game_state: GameState = use_context::<GameState>().unwrap();
     let copy_button_label = use_state(|| "📋");
     let game_data = game_state.game_data.borrow();

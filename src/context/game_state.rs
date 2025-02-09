@@ -113,6 +113,9 @@ impl GameState {
     }
     pub async fn create_game(&mut self) -> Result<(), GameError> {
         let res = create_game().await?;
+        let mut game_data = self.game_data.borrow_mut();
+        game_data.game_id = Some(res);
+        game_data.counter += 1;
         // self.game_id = Some(res);
         Ok(())
     }
