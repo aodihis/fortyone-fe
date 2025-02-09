@@ -5,6 +5,7 @@ use web_sys::wasm_bindgen::JsCast;
 use web_sys::window;
 use yew::platform::spawn_local;
 use yew::{function_component, html, use_context, use_state, Callback, Html, Properties, SubmitEvent};
+use crate::errors::game_error::GameError;
 
 #[derive(Clone, PartialEq)]
 enum PreGamePhase {
@@ -116,13 +117,9 @@ pub fn CreateGame() -> Html {
             let _name = name_element.value();
             let mut game_state =game_state.clone();
             spawn_local(async move {
-                match Rc::make_mut(&mut game_state).connect().await {
-                    true => {
-                        web_sys::console::log_1(&"connect".into());
-                    }
-                    false => {
-                        window().unwrap().alert_with_message("Failed to connect!").unwrap();
-                    }
+                match Rc::make_mut(&mut game_state).create_game().await {
+                    Ok(_) => {web_sys::console::log_1(&"connect".into());}
+                    Err(_) => {window().unwrap().alert_with_message("Failed to connect!").unwrap();}
                 }
             });
         })

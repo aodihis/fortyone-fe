@@ -5,3 +5,7 @@ pub struct ConnectResponse {
     pub game_id: String,
     pub num_of_players: usize,
 }
+
+pub struct InGameResponse {
+
+}

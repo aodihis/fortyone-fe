@@ -1,9 +1,9 @@
 use std::rc::Rc;
-use yew::{html, Component, Context, ContextProvider, Html};
+use yew::{html, Callback, Component, Context, ContextProvider, Html};
 use crate::components::in_game::InGame;
 use crate::components::pre_game::PreGame;
 use crate::context::game_state::{PlayerPhase, GameState, GameStatus};
-use crate::context::players::Player;
+use crate::models::players::Player;
 
 pub struct Game {
     game_state: Rc<GameState>,
@@ -35,6 +35,8 @@ impl Component for Game {
             bin: vec!["HA".to_string(),"S3".to_string(),"D10".to_string(),"C2".to_string()],
             hand: vec!["".to_string(),"".to_string(),"".to_string(),"".to_string()],
         }];
+
+
         let game_state = Rc::new(GameState {
             game_status: GameStatus::PreGame,
             game_id: None,

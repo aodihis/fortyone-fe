@@ -1,10 +1,13 @@
-use crate::context::players::Player;
+use crate::models::players::Player;
 use serde::{Deserialize, Serialize};
 use gloo_net::http::Request;
 use serde_json::Value;
 use web_sys::wasm_bindgen::JsValue;
+use yew::Callback;
 use yew::platform::spawn_local;
-use crate::context::api_data::ConnectResponse;
+use crate::models::api_data::ConnectResponse;
+use crate::errors::game_error::GameError;
+use crate::services::connection::create_game;
 
 #[derive(Debug,Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]
@@ -58,25 +61,21 @@ impl PartialEq for GameState {
     }
 }
 
-const API_URL: &str = env!("API_URL");
+
+
 
 impl GameState {
-    pub async fn connect(&mut self) -> bool {
-        web_sys::console::log_1(&API_URL.into());
 
-        let response = Request::get(&format!("{}/create", API_URL)).send().await;
+    pub async fn create_game(&mut self) -> Result<(), GameError> {
+        let res = create_game().await?;
+        self.game_id = Some(res);
+        Ok(())
+    }
+    pub async fn join_game(&mut self) -> Result<(), GameError> {
 
-        if let Ok(response) = response {
-            let data: ConnectResponse = response.json::<ConnectResponse>().await.unwrap();
-            self.game_id = Option::from(data.game_id.clone());
-            web_sys::console::log_1(&(data.game_id).into());
+        spawn_local(async {
 
-            spawn_local(async {
-
-            });
-            // let p = JsValue::from(&data["game_id"]);
-            return true
-        }
-        false
+        });
+        Ok(())
     }
 }
