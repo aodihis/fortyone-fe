@@ -1,11 +1,10 @@
 use crate::components::current_player::CurrentPlayer;
 use crate::components::enemy::{Enemy, EnemyPos};
 use crate::context::game_state::{GameState, PlayerPhase};
+use crate::utils::card_class;
 use gloo_timers::future::TimeoutFuture;
-use std::rc::Rc;
 use yew::platform::spawn_local;
 use yew::{classes, function_component, html, use_context, Callback, Component, Context, ContextHandle, Html, Properties};
-use crate::utils::card_class;
 
 #[derive(PartialEq)]
 enum Phase {
@@ -14,7 +13,7 @@ enum Phase {
 }
 
 pub enum Msg {
-    StateChanged(Rc<GameState>),
+    StateChanged(GameState),
     PhaseChanged(Phase),
     CardBinShow(Option<usize>)
 }
@@ -26,7 +25,7 @@ pub struct InGame{
     card_left: u8,
     current_player_index: usize,
     player_turn_index: usize,
-    _listener: ContextHandle<Rc<GameState>>
+    _listener: ContextHandle<GameState>
 }
 
 impl Component for InGame{
@@ -36,17 +35,17 @@ impl Component for InGame{
     fn create(ctx: &Context<Self>) -> Self {
 
         let (state, _listener) = ctx.link()
-            .context::<Rc<GameState>>(ctx.link().callback(Msg::StateChanged))
+            .context::<GameState>(ctx.link().callback(Msg::StateChanged))
             .expect("context to be set");
-
+        let game_data = state.game_data.borrow();
         Self {
-            player_phase: state.player_turn_phase.clone(),
+            player_phase: game_data.player_turn_phase.clone(),
             bin_index: None,
             phase: Phase::Sorting,
-            total_players: state.players.len() as u8,
-            current_player_index: state.current_player_index,
-            player_turn_index: state.player_turn_index,
-            card_left: state.card_left,
+            total_players: game_data.players.len() as u8,
+            current_player_index: game_data.current_player_index,
+            player_turn_index: game_data.player_turn_index,
+            card_left: game_data.card_left,
             _listener,
         }
     }
@@ -54,9 +53,10 @@ impl Component for InGame{
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::StateChanged(state) => {
-                self.total_players = state.players.len() as u8;
-                self.current_player_index = state.current_player_index;
-                self.card_left = state.card_left;
+                let game_data = state.game_data.borrow();
+                self.total_players = game_data.players.len() as u8;
+                self.current_player_index = game_data.current_player_index;
+                self.card_left = game_data.card_left;
                true
             }
             Msg::PhaseChanged(phase) => {
@@ -198,8 +198,8 @@ pub struct CardBinShowCaseProps {
 #[function_component]
 pub fn CardBinShowCase(props: &CardBinShowCaseProps) -> Html {
 
-    let game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
-
+    let game_state: GameState = use_context::<GameState>().unwrap();
+    let game_data = game_state.game_data.borrow();
     let onclose = {
         let cb = props.onclose.clone();
         Callback::from(move |_| {
@@ -208,7 +208,7 @@ pub fn CardBinShowCase(props: &CardBinShowCaseProps) -> Html {
     };
 
     let bin_index = props.bin_index;
-    let cards = game_state.players[bin_index].bin.iter().rev().map(|card| {
+    let cards = game_data.players[bin_index].bin.iter().rev().map(|card| {
         let class = card_class(card);
         html!{
             <div class={classes!("card", class)}></div>

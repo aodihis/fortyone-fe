@@ -1,3 +1,5 @@
+use std::cell::RefCell;
+use std::rc::Rc;
 use crate::models::players::Player;
 use serde::{Deserialize, Serialize};
 use gloo_net::http::Request;
@@ -39,7 +41,7 @@ pub enum GameStatus {
 }
 
 #[derive(Clone)]
-pub struct GameState {
+pub struct GameData {
     pub game_status: GameStatus,
     pub game_id: Option<String>,
     pub card_left: u8,
@@ -50,6 +52,12 @@ pub struct GameState {
     pub players: Vec<Player>,
     pub _event: Option<InGameEvent>,
     pub counter: usize,
+}
+
+#[derive(Clone)]
+pub struct GameState {
+
+    pub game_data: Rc<RefCell<GameData>>,
     // pub join: Callback<String>,
     // pub create_game: Callback<()>,
     // pub action: Callback<String>,
@@ -57,18 +65,55 @@ pub struct GameState {
 
 impl PartialEq for GameState {
     fn eq(&self, other: &Self) -> bool {
-        self.counter == other.counter
+        let game_data = self.game_data.borrow();
+        game_data.counter == other.game_data.borrow().counter
     }
 }
 
-
-
-
 impl GameState {
 
+    pub fn new() -> GameState {
+        let dummy_players = vec![Player{
+            name: "P1".to_string(),
+            score: 0,
+            bin: vec!["HA".to_string(),"S3".to_string(),"D10".to_string(),"C2".to_string()],
+            hand: vec!["H3".to_string(),"S8".to_string(),"D3".to_string(),"C2".to_string()],
+        },Player{
+            name: "P2".to_string(),
+            score: 0,
+            bin: vec!["HA".to_string(),"S3".to_string(),"D10".to_string(),"C2".to_string()],
+            hand: vec!["".to_string(),"".to_string(),"".to_string(),"".to_string()],
+        },Player{
+            name: "P3".to_string(),
+            score: 0,
+            bin: vec!["HA".to_string(),"S3".to_string(),"D10".to_string(),"C2".to_string()],
+            hand: vec!["".to_string(),"".to_string(),"".to_string(),"".to_string()],
+        },Player{
+            name: "P4".to_string(),
+            score: 0,
+            bin: vec!["HA".to_string(),"S3".to_string(),"D10".to_string(),"C2".to_string()],
+            hand: vec!["".to_string(),"".to_string(),"".to_string(),"".to_string()],
+        }];
+
+        let game_data = GameData {
+            game_status: GameStatus::PreGame,
+            game_id: None,
+            card_left: 52,
+            current_player_index: 0,
+            player_turn_index: 0,
+            player_turn_phase: PlayerPhase::P1,
+            current_player_name: Some(String::from("Mia")),
+            players: dummy_players,
+            _event: None,
+            counter: 0,
+        };
+        Self {
+            game_data: Rc::new(RefCell::new(game_data))
+        }
+    }
     pub async fn create_game(&mut self) -> Result<(), GameError> {
         let res = create_game().await?;
-        self.game_id = Some(res);
+        // self.game_id = Some(res);
         Ok(())
     }
     pub async fn join_game(&mut self) -> Result<(), GameError> {

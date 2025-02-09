@@ -1,6 +1,5 @@
 use crate::context::game_state::{GameState, PlayerPhase};
 use crate::utils::card_class;
-use std::rc::Rc;
 use web_sys::MouseEvent;
 use yew::{classes, html, Callback, Component, Context, ContextHandle, Html, Properties};
 
@@ -9,7 +8,7 @@ pub struct CurrentPlayerProps {
     pub on_bin_click : Callback<usize>,
 }
 pub enum Msg {
-    StateChanged(Rc<GameState>),
+    StateChanged(GameState),
 }
 pub struct CurrentPlayer {
     index: usize,
@@ -19,7 +18,7 @@ pub struct CurrentPlayer {
     hand: Vec<String>,
     bin: Vec<String>,
     score: i32,
-    _listener:ContextHandle<Rc<GameState>>
+    _listener:ContextHandle<GameState>
 }
 
 impl Component for CurrentPlayer {
@@ -28,27 +27,27 @@ impl Component for CurrentPlayer {
 
     fn create(ctx: &Context<Self>) -> Self {
         let (state, _listener) = ctx.link()
-            .context::<Rc<GameState>>(ctx.link().callback(Msg::StateChanged))
+            .context::<GameState>(ctx.link().callback(Msg::StateChanged))
             .expect("context to be set");
-
-        let is_turn = state.player_turn_index == state.current_player_index;
+        let game_data = state.game_data.borrow();
+        let is_turn = game_data.player_turn_index == game_data.current_player_index;
         Self {
-            index: state.current_player_index,
+            index: game_data.current_player_index,
             is_turn,
             player_phase: {
                 if is_turn {
-                    state.player_turn_phase.clone()
+                    game_data.player_turn_phase.clone()
                 } else {
                     PlayerPhase::Waiting
                 }
             },
-            name: match state.current_player_name {
+            name: match game_data.current_player_name {
                 Some(ref name) => name.clone(),
                 None => String::from(""),
             },
-            hand: state.players[state.current_player_index].hand.clone(),
-            bin: state.players[state.current_player_index].bin.clone(),
-            score: state.players[state.current_player_index].score,
+            hand: game_data.players[game_data.current_player_index].hand.clone(),
+            bin: game_data.players[game_data.current_player_index].bin.clone(),
+            score: game_data.players[game_data.current_player_index].score,
             _listener,
         }
     }
@@ -56,18 +55,19 @@ impl Component for CurrentPlayer {
     fn update(&mut self, _: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::StateChanged(state) => {
-                let is_turn = state.player_turn_index == state.current_player_index;
+                let game_data = state.game_data.borrow();
+                let is_turn = game_data.player_turn_index == game_data.current_player_index;
                 self.is_turn = is_turn;
                 self.player_phase = {
                     if is_turn {
-                        state.player_turn_phase.clone()
+                        game_data.player_turn_phase.clone()
                     } else {
                         PlayerPhase::Waiting
                     }
                 };
-                self.hand = state.players[state.current_player_index].hand.clone();
-                self.bin = state.players[state.current_player_index].bin.clone();
-                self.score = state.players[state.current_player_index].score;
+                self.hand = game_data.players[game_data.current_player_index].hand.clone();
+                self.bin = game_data.players[game_data.current_player_index].bin.clone();
+                self.score = game_data.players[game_data.current_player_index].score;
                 true
             }
         }

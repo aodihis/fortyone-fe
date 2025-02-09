@@ -5,7 +5,6 @@ use web_sys::wasm_bindgen::JsCast;
 use web_sys::window;
 use yew::platform::spawn_local;
 use yew::{function_component, html, use_context, use_state, Callback, Html, Properties, SubmitEvent};
-use crate::errors::game_error::GameError;
 
 #[derive(Clone, PartialEq)]
 enum PreGamePhase {
@@ -29,7 +28,7 @@ pub struct PreGameProps {
 pub fn PreGame(_: &PreGameProps) -> Html {
 
     let phase = use_state(|| PreGamePhase::Home);
-    let _game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
+    // let _game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
 
     let onclick = {
         let phase = phase.clone();
@@ -106,7 +105,7 @@ pub fn JoinGame() -> Html {
 #[function_component]
 pub fn CreateGame() -> Html {
     web_sys::console::log_1(&"CreateGame".into());
-    let game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
+    let game_state: GameState = use_context::<GameState>().unwrap();
     let onsubmit = {
         let game_state = game_state.clone();
         Callback::from(move |e: SubmitEvent| {
@@ -115,13 +114,13 @@ pub fn CreateGame() -> Html {
             let form = target.and_then(|t| t.dyn_into::<web_sys::HtmlFormElement>().ok()).expect("Couldn't get HtmlFormElement");
             let name_element = form.get_with_name("name").and_then(|name| name.dyn_into::<web_sys::HtmlInputElement>().ok()).unwrap();
             let _name = name_element.value();
-            let mut game_state =game_state.clone();
-            spawn_local(async move {
-                match Rc::make_mut(&mut game_state).create_game().await {
-                    Ok(_) => {web_sys::console::log_1(&"connect".into());}
-                    Err(_) => {window().unwrap().alert_with_message("Failed to connect!").unwrap();}
-                }
-            });
+            // let mut game_state =game_state.clone();
+            // spawn_local(async move {
+            //     match Rc::make_mut(&mut game_state).create_game().await {
+            //         Ok(_) => {web_sys::console::log_1(&"connect".into());}
+            //         Err(_) => {window().unwrap().alert_with_message("Failed to connect!").unwrap();}
+            //     }
+            // });
         })
     };
 
@@ -137,15 +136,15 @@ pub fn CreateGame() -> Html {
 
 #[function_component]
 pub fn WaitingGame() -> Html {
-    let game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
+    let game_state: GameState = use_context::<GameState>().unwrap();
     let copy_button_label = use_state(|| "📋");
-
-    let game_id = match &game_state.game_id {
+    let game_data = game_state.game_data.borrow();
+    let game_id = match &game_data.game_id {
         Some(game_id) => game_id.clone(),
         _ => return html!(),
     };
 
-    let players = game_state.players.iter().map(|player|html!(<div class="wg-player">{player.name.clone()}</div>)).collect::<Html>();
+    let players = game_data.players.iter().map(|player|html!(<div class="wg-player">{player.name.clone()}</div>)).collect::<Html>();
     // let players = game_state.players.iter().map(|player|html!(<div class="wg-player">{player.name.clone()}</div>)).collect::<Html>();
 
     let copy_id = {
@@ -181,7 +180,7 @@ pub fn WaitingGame() -> Html {
                         </button>
                     </div>
                     {
-                        if game_state.players.len() > 1 {
+                        if game_data.players.len() > 1 {
                             html! {<button class="">{"Start Game"}</button>}
                         } else {
                             html!{}
