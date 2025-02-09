@@ -4,12 +4,13 @@ use crate::models::players::Player;
 use serde::{Deserialize, Serialize};
 use gloo_net::http::Request;
 use serde_json::Value;
+use web_sys::console::log_1;
 use web_sys::wasm_bindgen::JsValue;
 use yew::Callback;
 use yew::platform::spawn_local;
 use crate::models::api_data::ConnectResponse;
 use crate::errors::game_error::GameError;
-use crate::services::connection::create_game;
+use crate::services::connection::{create_game, join_game};
 
 #[derive(Debug,Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]
@@ -121,6 +122,10 @@ impl GameState {
     }
     pub async fn join_game(&mut self) -> Result<(), GameError> {
 
+        log_1(&"joingin".into());
+        let game_data = self.game_data.borrow();
+        let game_id = game_data.game_id.clone().unwrap();
+        let ws = join_game(&game_id)?;
         spawn_local(async {
 
         });

@@ -126,14 +126,19 @@ pub fn CreateGame(props: &CreateGameProps) -> Html {
             let _name = name_element.value();
             let mut game_state = game_state.clone();
             let callback = callback.clone();
+
             spawn_local(async move {
                 match game_state.create_game().await {
                     Ok(_) => {
                         log_1(&"connect".into());
-                        callback.emit(());
+                        
                     }
                     Err(_) => {window().unwrap().alert_with_message("Failed to connect!").unwrap();}
                 }
+
+                callback.emit(());
+                game_state.join_game().await.expect("TODO: panic message");
+
             });
         })
     };

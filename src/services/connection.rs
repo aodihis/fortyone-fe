@@ -1,5 +1,10 @@
+use std::cell::RefCell;
 use std::env;
+use std::rc::Rc;
 use gloo_net::http::Request;
+use gloo_net::websocket::futures::WebSocket;
+use gloo_timers::future::TimeoutFuture;
+use crate::context::game_state::GameData;
 use crate::errors::game_error::GameError;
 use crate::models::api_data::ConnectResponse;
 
@@ -9,8 +14,7 @@ pub async fn create_game() -> Result<String, GameError> {
     // let api_url: &str = &get_api_url();
     let api_url: &str = API_URL;
     web_sys::console::log_1(&api_url.into());
-
-    return Ok("test".to_string());
+    // return Ok("test".to_string());
     let response = Request::get(&format!("{}/create", api_url)).send().await;
 
 
@@ -24,4 +28,17 @@ pub async fn create_game() -> Result<String, GameError> {
         }
     }
 
+}
+
+pub fn join_game(game_id: &str) -> Result<(WebSocket), GameError> {
+    let api_url: &str = API_URL;
+
+    let socket = match WebSocket::open(&format!("{}/{}/join", api_url, game_id)) {
+        Ok(ws) => ws,
+        Err(e) => {
+            return Err(GameError::JoinFailed(e.to_string()));
+        }
+    };
+    Ok(socket)
+    // let (writer, mut read) = socket.split();
 }
