@@ -3,15 +3,11 @@ use gloo_net::http::Request;
 use crate::errors::game_error::GameError;
 use crate::models::api_data::ConnectResponse;
 
-
-pub fn get_api_url() -> String {
-    env::var("API_URL").unwrap_or_else(|e| {
-        "http://localhost:8080".to_string()
-    })
-}
+const API_URL: &str = env!("API_URL");
 
 pub async fn create_game() -> Result<String, GameError> {
-    let api_url: &str = &get_api_url();
+    // let api_url: &str = &get_api_url();
+    let api_url: &str = API_URL;
     web_sys::console::log_1(&api_url.into());
 
     let response = Request::get(&format!("{}/create", api_url)).send().await;
