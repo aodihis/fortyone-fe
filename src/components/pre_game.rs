@@ -123,7 +123,7 @@ pub fn CreateGame(props: &CreateGameProps) -> Html {
             let target = e.target();
             let form = target.and_then(|t| t.dyn_into::<web_sys::HtmlFormElement>().ok()).expect("Couldn't get HtmlFormElement");
             let name_element = form.get_with_name("name").and_then(|name| name.dyn_into::<web_sys::HtmlInputElement>().ok()).unwrap();
-            let _name = name_element.value();
+            let name = name_element.value();
             let mut game_state = game_state.clone();
             let callback = callback.clone();
 
@@ -137,7 +137,7 @@ pub fn CreateGame(props: &CreateGameProps) -> Html {
                 }
 
                 callback.emit(());
-                game_state.join_game().await.expect("TODO: panic message");
+                game_state.join_game(&name).await.expect("TODO: panic message");
 
             });
         })

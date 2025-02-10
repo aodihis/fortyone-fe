@@ -120,12 +120,12 @@ impl GameState {
         // self.game_id = Some(res);
         Ok(())
     }
-    pub async fn join_game(&mut self) -> Result<(), GameError> {
+    pub async fn join_game(&mut self, name: &str) -> Result<(), GameError> {
 
         log_1(&"joingin".into());
         let game_data = self.game_data.borrow();
         let game_id = game_data.game_id.clone().unwrap();
-        let ws = join_game(&game_id)?;
+        let ws = join_game(&game_id, name)?;
         spawn_local(async {
 
         });

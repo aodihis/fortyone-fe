@@ -30,10 +30,10 @@ pub async fn create_game() -> Result<String, GameError> {
 
 }
 
-pub fn join_game(game_id: &str) -> Result<(WebSocket), GameError> {
+pub fn join_game(game_id: &str, name: &str) -> Result<(WebSocket), GameError> {
     let api_url: &str = API_URL;
 
-    let socket = match WebSocket::open(&format!("{}/{}/join", api_url, game_id)) {
+    let socket = match WebSocket::open(&format!("{}/{}/join?name={}", api_url, game_id, name)) {
         Ok(ws) => ws,
         Err(e) => {
             return Err(GameError::JoinFailed(e.to_string()));
