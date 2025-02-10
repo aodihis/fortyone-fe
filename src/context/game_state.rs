@@ -1,16 +1,15 @@
+use crate::errors::game_error::GameError;
+use crate::models::players::Player;
+use crate::services::connection::{create_game, join_game};
+use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
 use std::rc::Rc;
-use crate::models::players::Player;
-use serde::{Deserialize, Serialize};
-use gloo_net::http::Request;
-use serde_json::Value;
+use std::sync::Arc;
 use web_sys::console::log_1;
-use web_sys::wasm_bindgen::JsValue;
-use yew::Callback;
 use yew::platform::spawn_local;
-use crate::models::api_data::ConnectResponse;
-use crate::errors::game_error::GameError;
-use crate::services::connection::{create_game, join_game};
+use futures_util::{SinkExt, StreamExt};
+use gloo_net::websocket::Message;
+use crate::models::api_data::{GameResponse, MessageType, PlayerData};
 
 #[derive(Debug,Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]
@@ -57,7 +56,6 @@ pub struct GameData {
 
 #[derive(Clone)]
 pub struct GameState {
-
     pub game_data: Rc<RefCell<GameData>>,
     // pub join: Callback<String>,
     // pub create_game: Callback<()>,
@@ -67,6 +65,7 @@ pub struct GameState {
 impl PartialEq for GameState {
     fn eq(&self, other: &Self) -> bool {
         let game_data = self.game_data.borrow();
+        log_1(&format!("Eq triggered: {} - {}", game_data.counter, other.game_data.borrow().counter).into());
         game_data.counter == other.game_data.borrow().counter
     }
 }
@@ -74,28 +73,6 @@ impl PartialEq for GameState {
 impl GameState {
 
     pub fn new() -> GameState {
-        let dummy_players = vec![Player{
-            name: "P1".to_string(),
-            score: 0,
-            bin: vec!["HA".to_string(),"S3".to_string(),"D10".to_string(),"C2".to_string()],
-            hand: vec!["H3".to_string(),"S8".to_string(),"D3".to_string(),"C2".to_string()],
-        },Player{
-            name: "P2".to_string(),
-            score: 0,
-            bin: vec!["HA".to_string(),"S3".to_string(),"D10".to_string(),"C2".to_string()],
-            hand: vec!["".to_string(),"".to_string(),"".to_string(),"".to_string()],
-        },Player{
-            name: "P3".to_string(),
-            score: 0,
-            bin: vec!["HA".to_string(),"S3".to_string(),"D10".to_string(),"C2".to_string()],
-            hand: vec!["".to_string(),"".to_string(),"".to_string(),"".to_string()],
-        },Player{
-            name: "P4".to_string(),
-            score: 0,
-            bin: vec!["HA".to_string(),"S3".to_string(),"D10".to_string(),"C2".to_string()],
-            hand: vec!["".to_string(),"".to_string(),"".to_string(),"".to_string()],
-        }];
-
         let game_data = GameData {
             game_status: GameStatus::PreGame,
             game_id: None,
@@ -104,7 +81,7 @@ impl GameState {
             player_turn_index: 0,
             player_turn_phase: PlayerPhase::P1,
             current_player_name: Some(String::from("Mia")),
-            players: dummy_players,
+            players: vec![],
             _event: None,
             counter: 0,
         };
@@ -126,9 +103,46 @@ impl GameState {
         let game_data = self.game_data.borrow();
         let game_id = game_data.game_id.clone().unwrap();
         let ws = join_game(&game_id, name)?;
-        spawn_local(async {
-
+        let (writer, mut read) = ws.split();
+        // self.ws = Some(ws.c);
+        let game_data_arc = self.game_data.clone();
+        spawn_local(async move {
+            while let Some(Ok(msg)) = read.next().await {
+                match msg {
+                    Message::Text(message) => {
+                        log_1(&message.clone().into());
+                        let game_response = serde_json::from_str::<GameResponse>(message.as_str()).unwrap();
+                        match game_response.message_type {
+                            MessageType::PlayerJoin => {
+                                let players = game_response.data.unwrap().players;
+                                GameState::handle_players_change(game_data_arc.clone(), &players, true);
+                                // self.handle_players_change(&players);
+                                // self.game_data.borrow_mut().counter += 1;
+                            }
+                            MessageType::PlayerLeft => {}
+                            MessageType::GameEvent => {}
+                            MessageType::EndGame => {}
+                        };
+                    }
+                    Message::Bytes(message ) => {}
+                }
+                // log_1(&msg.to_into());
+            }
         });
         Ok(())
+    }
+
+    fn handle_players_change(game_data_arc: Rc<RefCell<GameData>>, players: &Vec<PlayerData>, update_count: bool) {
+            let mut game_data = game_data_arc.borrow_mut();
+            game_data.players = players.into_iter().map(|player| {
+                   Player {
+                       name: player.name.clone(),
+                       bin: player.bin.clone(),
+                       hand: player.hand.clone(),
+                   }
+               }).collect();
+            if update_count {
+                game_data.counter += 1;
+            }
     }
 }

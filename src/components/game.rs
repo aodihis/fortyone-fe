@@ -13,10 +13,7 @@ impl Component for Game {
 
     fn create(_ctx: &Context<Self>) -> Self {
 
-
-
         let game_state = GameState::new();
-
         Self {
             state_ref: game_state,
         }

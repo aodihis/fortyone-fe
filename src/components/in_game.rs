@@ -3,6 +3,7 @@ use crate::components::enemy::{Enemy, EnemyPos};
 use crate::context::game_state::{GameState, PlayerPhase};
 use crate::utils::card_class;
 use gloo_timers::future::TimeoutFuture;
+use web_sys::console::log_1;
 use yew::platform::spawn_local;
 use yew::{classes, function_component, html, use_context, Callback, Component, Context, ContextHandle, Html, Properties};
 
@@ -53,6 +54,7 @@ impl Component for InGame{
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::StateChanged(state) => {
+                log_1(&"State Changed".into());
                 let game_data = state.game_data.borrow();
                 self.total_players = game_data.players.len() as u8;
                 self.current_player_index = game_data.current_player_index;

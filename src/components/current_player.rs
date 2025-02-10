@@ -17,7 +17,6 @@ pub struct CurrentPlayer {
     name: String,
     hand: Vec<String>,
     bin: Vec<String>,
-    score: i32,
     _listener:ContextHandle<GameState>
 }
 
@@ -47,7 +46,6 @@ impl Component for CurrentPlayer {
             },
             hand: game_data.players[game_data.current_player_index].hand.clone(),
             bin: game_data.players[game_data.current_player_index].bin.clone(),
-            score: game_data.players[game_data.current_player_index].score,
             _listener,
         }
     }
@@ -67,7 +65,6 @@ impl Component for CurrentPlayer {
                 };
                 self.hand = game_data.players[game_data.current_player_index].hand.clone();
                 self.bin = game_data.players[game_data.current_player_index].bin.clone();
-                self.score = game_data.players[game_data.current_player_index].score;
                 true
             }
         }
