@@ -1,4 +1,4 @@
-use crate::context::game_state::GameState;
+use crate::context::game_state::{GameState, GameStatus};
 use crate::utils::card_class;
 use std::rc::Rc;
 use yew::{classes, html, Callback, Component, Context, ContextHandle, Html, Properties};
@@ -55,7 +55,9 @@ impl Component for Enemy {
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::StateChanged(state) => {
-
+                if state.game_status != GameStatus::InProgress {
+                    return false;
+                }
                 let index = self.index;
                 self.total_cards = state.players[index as usize].hand.len() as u8;
                 self.bin = state.players[index as usize].bin.clone();

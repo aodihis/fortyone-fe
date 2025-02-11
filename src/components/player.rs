@@ -1,4 +1,4 @@
-use crate::context::game_state::{GameState, PlayerPhase};
+use crate::context::game_state::{GameState, GameStatus, PlayerPhase};
 use crate::utils::card_class;
 use std::rc::Rc;
 use web_sys::console::log_1;
@@ -57,6 +57,9 @@ impl Component for ThePlayer {
     fn update(&mut self, _: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::StateChanged(state) => {
+                if state.game_status != GameStatus::InProgress {
+                    return false;
+                }
                 let is_turn = state.current_turn_index == state.player_index;
                 self.is_turn = is_turn;
                 self.player_phase = {

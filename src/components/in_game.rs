@@ -1,6 +1,6 @@
 use crate::components::enemy::{Enemy, EnemyPos};
 use crate::components::player::ThePlayer;
-use crate::context::game_state::{GameState, PlayerPhase};
+use crate::context::game_state::{GameState, GameStatus, PlayerPhase};
 use crate::utils::card_class;
 use gloo_timers::future::TimeoutFuture;
 use std::rc::Rc;
@@ -55,6 +55,9 @@ impl Component for InGame{
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::StateChanged(state) => {
+                if state.game_status != GameStatus::InProgress {
+                    return false;
+                }
                 self.total_players = state.players.len() as u8;
                 self.player_index = state.player_index;
                 self.current_turn_index = state.current_turn_index;
