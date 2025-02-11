@@ -1,21 +1,20 @@
-use std::cell::RefCell;
 use crate::components::in_game::InGame;
 use crate::components::pre_game::PreGame;
 use crate::context::game_state::{GameState, GameStatus};
-use std::rc::Rc;
-use futures_util::stream::{SplitSink, SplitStream};
-use futures_util::{SinkExt, StreamExt, TryStreamExt};
-use futures_util::future::{AbortHandle, Abortable};
-use gloo_net::websocket::futures::WebSocket;
-use gloo_net::websocket::{Message, WebSocketError};
-use web_sys::console::log_1;
-use web_sys::window;
-use yew::{html, Component, Context, ContextProvider, Html, Properties};
-use yew::platform::spawn_local;
-use crate::errors::game_error::GameError;
 use crate::models::api_data::{GameResponse, MessageType};
 use crate::models::players::Player;
 use crate::services::connection::{create_game, join_game};
+use futures_util::future::{AbortHandle, Abortable};
+use futures_util::stream::{SplitSink, SplitStream};
+use futures_util::{SinkExt, StreamExt};
+use gloo_net::websocket::futures::WebSocket;
+use gloo_net::websocket::Message;
+use std::cell::RefCell;
+use std::rc::Rc;
+use web_sys::console::log_1;
+use web_sys::window;
+use yew::platform::spawn_local;
+use yew::{html, Component, Context, ContextProvider, Html, Properties};
 
 pub struct Game {
     state_ref: Rc<GameState>,
@@ -98,8 +97,10 @@ impl Component for Game {
                                 let game_response = serde_json::from_str::<GameResponse>(message.as_str()).unwrap();
                                 link.send_message(Msg::GameUpdate(game_response));
                             }
-                            Ok(Message::Bytes(text)) => {}
-                            Err(_) => {}
+                            Ok(Message::Bytes(_)) => {}
+                            Err(_) => {
+                                link.send_message(Msg::Disconnect);
+                            }
                         };
                     }
                 };
