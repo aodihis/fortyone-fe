@@ -175,7 +175,7 @@ pub fn CreateGame(props: &CreateGameProps) -> Html {
         <div class="game-form">
             <form onsubmit={onsubmit}>
                 <input name="name" type="text" placeholder="Please, input your name"/>
-                <button type="submit">{"Join Game"}</button>
+                <button type="submit">{"Create Game"}</button>
             </form>
             <button onclick={onback}>{"Back"}</button>
         </div>

@@ -30,6 +30,10 @@ pub enum Msg {
     Listener(SplitStream<WebSocket>),
     GameJoined(String),
     GameUpdate(GameResponse),
+    Draw,
+    TakeBin,
+    Discard(String),
+    Close(String),
 }
 impl Component for Game {
     type Message = Msg;
@@ -40,7 +44,11 @@ impl Component for Game {
         let join_game = ctx.link().callback(|(game_id, name)| Msg::JoinGame(game_id, name));
         let disconnect = ctx.link().callback(|_| Msg::Disconnect);
         let start_game = ctx.link().callback(|_| Msg::StartGame);
-        let game_state = Rc::new(GameState::new(create_game, join_game, disconnect,start_game));
+        let draw = ctx.link().callback(|_| Msg::Draw);
+        let take_bin = ctx.link().callback(|_| Msg::TakeBin);
+        let discard = ctx.link().callback(|card| Msg::Discard(card));
+        let close = ctx.link().callback(|card| Msg::Close(card));
+        let game_state = Rc::new(GameState::new(create_game, join_game, disconnect,start_game, draw, take_bin, discard, close));
 
         Self {
             state_ref: game_state,
@@ -199,7 +207,68 @@ impl Component for Game {
                     }
                 });
                 true
+            },
+            Msg::Draw => {
+                let writer = self.writer.clone();
+                spawn_local(async move {
+                    let payload = RequestPayload {
+                        action: GameRequestAction::Draw,
+                        card: None,
+                    };
+                    let mut binding = writer.borrow_mut();
+                    let wr = binding.as_mut();
+                    if let Some(writer) = wr {
+                        let _ = send_message(writer, serde_json::to_string(&payload).unwrap()).await;
+                    }
+                });
+                false
+            },
+            Msg::TakeBin => {
+                let writer = self.writer.clone();
+                spawn_local(async move {
+                    let payload = RequestPayload {
+                        action: GameRequestAction::TakeBin,
+                        card: None,
+                    };
+                    let mut binding = writer.borrow_mut();
+                    let wr = binding.as_mut();
+                    if let Some(writer) = wr {
+                        let _ = send_message(writer, serde_json::to_string(&payload).unwrap()).await;
+                    }
+                });
+                false
+            },
+            Msg::Discard(card) => {
+                let writer = self.writer.clone();
+                spawn_local(async move {
+                    let payload = RequestPayload {
+                        action: GameRequestAction::Discard,
+                        card: Some(card),
+                    };
+                    let mut binding = writer.borrow_mut();
+                    let wr = binding.as_mut();
+                    if let Some(writer) = wr {
+                        let _ = send_message(writer, serde_json::to_string(&payload).unwrap()).await;
+                    }
+                });
+                false
+            },
+            Msg::Close(card) => {
+                let writer = self.writer.clone();
+                spawn_local(async move {
+                    let payload = RequestPayload {
+                        action: GameRequestAction::Close,
+                        card: Some(card),
+                    };
+                    let mut binding = writer.borrow_mut();
+                    let wr = binding.as_mut();
+                    if let Some(writer) = wr {
+                        let _ = send_message(writer, serde_json::to_string(&payload).unwrap()).await;
+                    }
+                });
+                false
             }
+
         }
     }
 

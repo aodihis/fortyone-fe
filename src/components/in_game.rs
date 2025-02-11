@@ -27,6 +27,7 @@ pub struct InGame{
     card_left: u8,
     player_index: usize,
     current_turn_index: usize,
+    draw_cb: Callback<()>,
     _listener: ContextHandle<Rc<GameState>>
 }
 
@@ -47,6 +48,7 @@ impl Component for InGame{
             player_index: state.player_index,
             current_turn_index: state.current_turn_index,
             card_left: state.card_left,
+            draw_cb: state.draw.clone(),
             _listener,
         }
     }
@@ -81,7 +83,7 @@ impl Component for InGame{
             let link = link.clone();
             Callback::from(move |index: usize| {
 
-                web_sys::console::log_1(&index.into());
+                log_1(&index.into());
                 link.send_message(Msg::CardBinShow(Some(index)));
         })};
 
@@ -112,8 +114,11 @@ impl Component for InGame{
 
         let on_draw = {
             let is_player_draw = self.current_turn_index == self.player_index && self.player_phase == PlayerPhase::P1;
+            let draw_cb = self.draw_cb.clone();
             Callback::from(move |_| {
-                if is_player_draw {}
+                if is_player_draw {
+                    draw_cb.emit(());
+                }
             })
         };
 

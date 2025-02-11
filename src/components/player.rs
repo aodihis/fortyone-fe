@@ -1,6 +1,7 @@
 use crate::context::game_state::{GameState, PlayerPhase};
 use crate::utils::card_class;
 use std::rc::Rc;
+use web_sys::console::log_1;
 use web_sys::MouseEvent;
 use yew::{classes, html, Callback, Component, Context, ContextHandle, Html, Properties};
 
@@ -18,6 +19,9 @@ pub struct ThePlayer {
     name: String,
     hand: Vec<String>,
     bin: Vec<String>,
+    take_bin_cb : Callback<()>,
+    discard_cb : Callback<String>,
+    close_cb : Callback<String>,
     _listener:ContextHandle<Rc<GameState>>
 }
 
@@ -43,6 +47,9 @@ impl Component for ThePlayer {
             name: state.player_name.clone(),
             hand: state.players[state.player_index].hand.clone(),
             bin: state.players[state.player_index].bin.clone(),
+            take_bin_cb: state.take_bin.clone(),
+            discard_cb: state.discard.clone(),
+            close_cb: state.close.clone(),
             _listener,
         }
     }
@@ -75,20 +82,32 @@ impl Component for ThePlayer {
 
         let is_draw_phase = self.is_turn && self.player_phase == PlayerPhase::P1;
         let is_discard_phase = self.is_turn && self.player_phase == PlayerPhase::P2;
+        let take_bin_cb = self.take_bin_cb.clone();
+        let discard_cb = self.discard_cb.clone();
+        let close_cb = self.close_cb.clone();
+
         let on_take_bin = Callback::from(move |event: MouseEvent| {
             event.prevent_default();
             if is_draw_phase {
-
+                take_bin_cb.emit(());
             }
         });
 
-        let on_discard = Callback::from(move |event: MouseEvent| {
-            event.prevent_default();
-            if is_draw_phase {
-
+        let on_discard = Callback::from(move |(card, e): (String, MouseEvent)| {
+            e.prevent_default();
+            log_1(&"Discarded card".into());
+            if is_discard_phase {
+                discard_cb.emit(card);
             }
         });
 
+        let on_close = Callback::from(move |(card, e): (String, MouseEvent)| {
+            e.prevent_default();
+            log_1(&"Discarded card".into());
+            if is_discard_phase {
+                close_cb.emit(card);
+            }
+        });
         html!{
             <>
                 <div class="current-player">
@@ -118,8 +137,23 @@ impl Component for ThePlayer {
                         {
                             self.hand.iter().map(|h| {
                                 let card_class = card_class(h);
+                                let onclick = {
+                                    let on_discard = on_discard.clone();
+                                    let h = h.clone();
+                                    Callback::from(move |e: MouseEvent| {
+                                        on_discard.emit((h.clone(), e));
+                                    })
+                                };
+
+                                let oncontextmenu = {
+                                    let on_close = on_close.clone();
+                                    let h = h.clone();
+                                    Callback::from(move |e: MouseEvent| {
+                                        on_close.emit((h.clone(), e));
+                                    })
+                                };
                                 html!{
-                                    <div class={classes!("card", card_class)} oncontextmenu={on_discard.clone()}></div>
+                                    <div class={classes!("card", card_class)} oncontextmenu={oncontextmenu} onclick={onclick}></div>
                                 }
                             }).collect::<Html>()
                         }
