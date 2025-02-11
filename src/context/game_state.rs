@@ -47,6 +47,7 @@ pub struct GameState {
     pub create_game: Callback<String>,
     pub join: Callback<(String, String)>,
     pub disconnect: Callback<()>,
+    pub start_game: Callback<()>,
     // pub join: Callback<String>,
     // pub create_game: Callback<()>,
     // pub action: Callback<String>,
@@ -60,7 +61,7 @@ impl PartialEq for GameState {
 
 impl GameState {
 
-    pub fn new(create_game: Callback<String>, join: Callback<(String, String)>, disconnect: Callback<()>) -> GameState {
+    pub fn new(create_game: Callback<String>, join: Callback<(String, String)>, disconnect: Callback<()>, start_game: Callback<()>) -> GameState {
         Self {
             game_status: GameStatus::PreGame,
             game_id: None,
@@ -74,7 +75,8 @@ impl GameState {
             counter: 0,
             create_game,
             join,
-            disconnect
+            disconnect,
+            start_game
         }
     }
 

@@ -1,9 +1,9 @@
 use crate::components::in_game::InGame;
 use crate::components::pre_game::PreGame;
 use crate::context::game_state::{GameState, GameStatus};
-use crate::models::api_data::{GameResponse, MessageType};
+use crate::models::api_data::{GameRequestAction, GameResponse, MessageType, RequestPayload};
 use crate::models::players::Player;
-use crate::services::connection::{create_game, join_game};
+use crate::services::connection::{create_game, join_game, send_message};
 use futures_util::future::{AbortHandle, Abortable};
 use futures_util::stream::{SplitSink, SplitStream};
 use futures_util::{SinkExt, StreamExt};
@@ -24,6 +24,7 @@ pub struct Game {
 
 pub enum Msg {
     CreateGame(String),
+    StartGame,
     Disconnect,
     JoinGame(String, String),
     Listener(SplitStream<WebSocket>),
@@ -38,7 +39,8 @@ impl Component for Game {
         let create_game = ctx.link().callback(|name| Msg::CreateGame(name));
         let join_game = ctx.link().callback(|(game_id, name)| Msg::JoinGame(game_id, name));
         let disconnect = ctx.link().callback(|_| Msg::Disconnect);
-        let game_state = Rc::new(GameState::new(create_game, join_game, disconnect));
+        let start_game = ctx.link().callback(|_| Msg::StartGame);
+        let game_state = Rc::new(GameState::new(create_game, join_game, disconnect,start_game));
 
         Self {
             state_ref: game_state,
@@ -54,7 +56,17 @@ impl Component for Game {
             Msg::CreateGame(name) => {
                 let link = ctx.link().clone();
                 spawn_local(async move {
-                    let game_id = create_game().await.expect("Failed to create Game");
+                    let game_id = match create_game().await {
+                        Ok(game_id) => game_id,
+                        Err(_) => {
+                            if let Some(window) = window() {
+                                window
+                                    .alert_with_message("Connection error!")
+                                    .unwrap();
+                            }
+                            return;
+                        }
+                    };
                     link.send_message(Msg::JoinGame(game_id, name));
                 });
                 false
@@ -139,6 +151,9 @@ impl Component for Game {
                     },
                     MessageType::GameEvent => {
                         let data = response.data.unwrap();
+                        let player_index = data.player_pos.unwrap() as usize;
+
+                        state_mut.game_status = GameStatus::InProgress;
                         state_mut.players = data.players.iter().map(|player|{
                             Player {
                                 name: player.name.clone(),
@@ -146,14 +161,15 @@ impl Component for Game {
                                 hand: player.hand.clone(),
                             }
                         }).collect();
-                        state_mut.p = data.player_pos.unwrap() as usize;
-                        Rc::make_mut(&mut self.state_ref).player_name = "".to_string();
-                        Rc::make_mut(&mut self.state_ref).current_turn_phase = "".to_string();
+                        state_mut.player_index = player_index;
+                        state_mut.player_name = data.players[player_index].name.clone();
+                        state_mut.current_turn_index = data.current_turn.unwrap() as usize;
+                        state_mut.current_turn_phase = data.current_phase.unwrap();
                         // Rc::make_mut(&mut self.state_ref).current_player_name;
                     }
                     _ => {}
                 }
-                Rc::make_mut(&mut self.state_ref).counter += 1;
+                state_mut.counter += 1;
                 true
             }
             Msg::Disconnect => {
@@ -165,6 +181,21 @@ impl Component for Game {
                 spawn_local(async move {
                     if let Some(mut writer) = wr {
                         writer.close().await.unwrap();
+                    }
+                });
+                true
+            },
+            Msg::StartGame => {
+                let writer = self.writer.clone();
+                spawn_local(async move {
+                    let payload = RequestPayload {
+                        action: GameRequestAction::StartGame,
+                        card: None,
+                    };
+                    let mut binding = writer.borrow_mut();
+                    let wr = binding.as_mut();
+                    if let Some(writer) = wr {
+                        let _ = send_message(writer, serde_json::to_string(&payload).unwrap()).await;
                     }
                 });
                 true

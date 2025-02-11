@@ -210,6 +210,13 @@ pub fn WaitingGame() -> Html {
             disconnect.emit(());
         })
     };
+
+    let start_onclick = {
+        let start_game = game_state.start_game.clone();
+        Callback::from(move |_| {
+            start_game.emit(());
+        })
+    };
     html! {
         <>
             <div class="waiting-game">
@@ -228,7 +235,7 @@ pub fn WaitingGame() -> Html {
                     </div>
                     {
                         if game_state.players.len() > 1 {
-                            html! {<button class="">{"Start Game"}</button>}
+                            html! {<button class="" onclick={start_onclick}>{"Start Game"}</button>}
                         } else {
                             html!{}
                         }
