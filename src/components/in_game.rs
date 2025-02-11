@@ -1,4 +1,4 @@
-use crate::components::current_player::CurrentPlayer;
+use crate::components::player::ThePlayer;
 use crate::components::enemy::{Enemy, EnemyPos};
 use crate::context::game_state::{GameState, PlayerPhase};
 use crate::utils::card_class;
@@ -25,8 +25,8 @@ pub struct InGame{
     player_phase: PlayerPhase,
     total_players: u8,
     card_left: u8,
-    current_player_index: usize,
-    player_turn_index: usize,
+    player_index: usize,
+    current_turn_index: usize,
     _listener: ContextHandle<Rc<GameState>>
 }
 
@@ -40,12 +40,12 @@ impl Component for InGame{
             .context::<Rc<GameState>>(ctx.link().callback(Msg::StateChanged))
             .expect("context to be set");
         Self {
-            player_phase: state.player_turn_phase.clone(),
+            player_phase: state.current_turn_phase.clone(),
             bin_index: None,
-            phase: Phase::Sorting,
+            phase: Phase::Dealing,
             total_players: state.players.len() as u8,
-            current_player_index: state.current_player_index,
-            player_turn_index: state.player_turn_index,
+            player_index: state.player_index,
+            current_turn_index: state.current_turn_index,
             card_left: state.card_left,
             _listener,
         }
@@ -56,7 +56,7 @@ impl Component for InGame{
             Msg::StateChanged(state) => {
                 log_1(&"State Changed".into());
                 self.total_players = state.players.len() as u8;
-                self.current_player_index = state.current_player_index;
+                self.player_index = state.player_index;
                 self.card_left = state.card_left;
                true
             }
@@ -73,7 +73,7 @@ impl Component for InGame{
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let total_players = self.total_players;
-        let player_index = self.current_player_index;
+        let player_index = self.player_index;
 
         let link = ctx.link().clone();
 
@@ -111,7 +111,7 @@ impl Component for InGame{
         });
 
         let on_draw = {
-            let is_player_draw = self.player_turn_index == self.current_player_index && self.player_phase == PlayerPhase::P1;
+            let is_player_draw = self.current_turn_index == self.player_index && self.player_phase == PlayerPhase::P1;
             Callback::from(move |_| {
                 if is_player_draw {}
             })
@@ -134,7 +134,7 @@ impl Component for InGame{
                         html!{
                             <>
                                 {for enemies}
-                                <CurrentPlayer on_bin_click={on_bin_click} />
+                                <ThePlayer on_bin_click={on_bin_click} />
                             </>
                         }
                     }

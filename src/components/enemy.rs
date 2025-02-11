@@ -1,6 +1,5 @@
 use crate::context::game_state::GameState;
 use crate::utils::card_class;
-use rand::Rng;
 use std::rc::Rc;
 use yew::{classes, html, Callback, Component, Context, ContextHandle, Html, Properties};
 
@@ -48,7 +47,7 @@ impl Component for Enemy {
             name: state.players[index as usize].name.clone(),
             total_cards: state.players[index as usize].hand.len() as u8,
             bin: state.players[index as usize].bin.clone(),
-            is_turn: state.current_player_index == index as usize,
+            is_turn: state.player_index == index as usize,
             _listener,
         }
     }
@@ -60,7 +59,7 @@ impl Component for Enemy {
                 let index = self.index;
                 self.total_cards = state.players[index as usize].hand.len() as u8;
                 self.bin = state.players[index as usize].bin.clone();
-                self.is_turn = state.current_player_index == index as usize;
+                self.is_turn = state.player_index == index as usize;
                 true
             }
         }

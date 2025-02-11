@@ -37,10 +37,10 @@ pub struct GameState {
     pub game_status: GameStatus,
     pub game_id: Option<String>,
     pub card_left: u8,
-    pub current_player_index: usize,
-    pub current_player_name: Option<String>, // the person name who open the game
-    pub player_turn_index: usize, // the turn index
-    pub player_turn_phase: PlayerPhase,
+    pub player_index: usize,
+    pub player_name: String, // the person name who open the game
+    pub current_turn_index: usize, // the turn index
+    pub current_turn_phase: PlayerPhase,
     pub players: Vec<Player>,
     pub _event: Option<InGameEvent>,
     pub counter: usize,
@@ -65,10 +65,10 @@ impl GameState {
             game_status: GameStatus::PreGame,
             game_id: None,
             card_left: 52,
-            current_player_index: 0,
-            player_turn_index: 0,
-            player_turn_phase: PlayerPhase::P1,
-            current_player_name: None,
+            player_index: 0,
+            current_turn_index: 0,
+            current_turn_phase: PlayerPhase::P1,
+            player_name: "".to_string(),
             players: vec![],
             _event: None,
             counter: 0,
@@ -82,10 +82,10 @@ impl GameState {
         self.game_status = GameStatus::PreGame;
         self.game_id = None;
         self.card_left = 52;
-        self.current_player_index = 0;
-        self.player_turn_index = 0;
-        self.player_turn_phase = PlayerPhase::P1;
-        self.current_player_name = None;
+        self.player_index = 0;
+        self.current_turn_index = 0;
+        self.current_turn_phase = PlayerPhase::P1;
+        self.player_name = "".to_string();
         self.players = vec![];
         self.counter = 0;
         self._event = None;

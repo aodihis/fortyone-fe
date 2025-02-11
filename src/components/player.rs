@@ -11,7 +11,7 @@ pub struct CurrentPlayerProps {
 pub enum Msg {
     StateChanged(Rc<GameState>),
 }
-pub struct CurrentPlayer {
+pub struct ThePlayer {
     index: usize,
     is_turn: bool,
     player_phase: PlayerPhase,
@@ -21,7 +21,7 @@ pub struct CurrentPlayer {
     _listener:ContextHandle<Rc<GameState>>
 }
 
-impl Component for CurrentPlayer {
+impl Component for ThePlayer {
     type Message = Msg;
     type Properties = CurrentPlayerProps;
 
@@ -29,23 +29,20 @@ impl Component for CurrentPlayer {
         let (state, _listener) = ctx.link()
             .context::<Rc<GameState>>(ctx.link().callback(Msg::StateChanged))
             .expect("context to be set");
-        let is_turn = state.player_turn_index == state.current_player_index;
+        let is_turn = state.current_turn_index == state.player_index;
         Self {
-            index: state.current_player_index,
+            index: state.player_index,
             is_turn,
             player_phase: {
                 if is_turn {
-                    state.player_turn_phase.clone()
+                    state.current_turn_phase.clone()
                 } else {
                     PlayerPhase::Waiting
                 }
             },
-            name: match state.current_player_name {
-                Some(ref name) => name.clone(),
-                None => String::from(""),
-            },
-            hand: state.players[state.current_player_index].hand.clone(),
-            bin: state.players[state.current_player_index].bin.clone(),
+            name: state.player_name.clone(),
+            hand: state.players[state.player_index].hand.clone(),
+            bin: state.players[state.player_index].bin.clone(),
             _listener,
         }
     }
@@ -53,17 +50,17 @@ impl Component for CurrentPlayer {
     fn update(&mut self, _: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::StateChanged(state) => {
-                let is_turn = state.player_turn_index == state.current_player_index;
+                let is_turn = state.current_turn_index == state.player_index;
                 self.is_turn = is_turn;
                 self.player_phase = {
                     if is_turn {
-                        state.player_turn_phase.clone()
+                        state.current_turn_phase.clone()
                     } else {
                         PlayerPhase::Waiting
                     }
                 };
-                self.hand = state.players[state.current_player_index].hand.clone();
-                self.bin = state.players[state.current_player_index].bin.clone();
+                self.hand = state.players[state.player_index].hand.clone();
+                self.bin = state.players[state.player_index].bin.clone();
                 true
             }
         }

@@ -48,6 +48,8 @@ impl Component for Game {
     }
 
      fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+
+        let state_mut = Rc::make_mut(&mut self.state_ref);
         match msg {
             Msg::CreateGame(name) => {
                 let link = ctx.link().clone();
@@ -118,7 +120,7 @@ impl Component for Game {
                 }
                 match response.message_type {
                     MessageType::PlayerJoin => {
-                        Rc::make_mut(&mut self.state_ref).players = response.data.unwrap().players.iter().map(|player|{
+                        state_mut.players = response.data.unwrap().players.iter().map(|player|{
                             Player {
                                 name: player.name.clone(),
                                 bin: vec![],
@@ -127,7 +129,7 @@ impl Component for Game {
                         }).collect();
                     },
                     MessageType::PlayerLeft => {
-                        Rc::make_mut(&mut self.state_ref).players = response.data.unwrap().players.iter().map(|player|{
+                        state_mut.players = response.data.unwrap().players.iter().map(|player|{
                             Player {
                                 name: player.name.clone(),
                                 bin: vec![],
@@ -135,13 +137,27 @@ impl Component for Game {
                             }
                         }).collect();
                     },
+                    MessageType::GameEvent => {
+                        let data = response.data.unwrap();
+                        state_mut.players = data.players.iter().map(|player|{
+                            Player {
+                                name: player.name.clone(),
+                                bin: player.bin.clone(),
+                                hand: player.hand.clone(),
+                            }
+                        }).collect();
+                        state_mut.p = data.player_pos.unwrap() as usize;
+                        Rc::make_mut(&mut self.state_ref).player_name = "".to_string();
+                        Rc::make_mut(&mut self.state_ref).current_turn_phase = "".to_string();
+                        // Rc::make_mut(&mut self.state_ref).current_player_name;
+                    }
                     _ => {}
                 }
                 Rc::make_mut(&mut self.state_ref).counter += 1;
                 true
             }
             Msg::Disconnect => {
-                Rc::make_mut(&mut self.state_ref).clear();
+                state_mut.clear();
                 if let Some(handle) = self.reader_abort.borrow_mut().take() {
                     handle.abort();
                 }
