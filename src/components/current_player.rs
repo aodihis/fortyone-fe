@@ -1,3 +1,5 @@
+use std::cell::RefCell;
+use std::rc::Rc;
 use crate::context::game_state::{GameState, PlayerPhase};
 use crate::utils::card_class;
 use web_sys::MouseEvent;
@@ -8,7 +10,7 @@ pub struct CurrentPlayerProps {
     pub on_bin_click : Callback<usize>,
 }
 pub enum Msg {
-    StateChanged(GameState),
+    StateChanged(Rc<RefCell<GameState>>),
 }
 pub struct CurrentPlayer {
     index: usize,
@@ -17,7 +19,7 @@ pub struct CurrentPlayer {
     name: String,
     hand: Vec<String>,
     bin: Vec<String>,
-    _listener:ContextHandle<GameState>
+    _listener:ContextHandle<Rc<RefCell<GameState>>>
 }
 
 impl Component for CurrentPlayer {
@@ -26,9 +28,9 @@ impl Component for CurrentPlayer {
 
     fn create(ctx: &Context<Self>) -> Self {
         let (state, _listener) = ctx.link()
-            .context::<GameState>(ctx.link().callback(Msg::StateChanged))
+            .context::<Rc<RefCell<GameState>>>(ctx.link().callback(Msg::StateChanged))
             .expect("context to be set");
-        let game_data = state.game_data.borrow();
+        let game_data = state.borrow();
         let is_turn = game_data.player_turn_index == game_data.current_player_index;
         Self {
             index: game_data.current_player_index,
@@ -53,7 +55,7 @@ impl Component for CurrentPlayer {
     fn update(&mut self, _: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::StateChanged(state) => {
-                let game_data = state.game_data.borrow();
+                let game_data = state.borrow();
                 let is_turn = game_data.player_turn_index == game_data.current_player_index;
                 self.is_turn = is_turn;
                 self.player_phase = {

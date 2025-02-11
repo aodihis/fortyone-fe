@@ -1,3 +1,5 @@
+use std::cell::RefCell;
+use std::rc::Rc;
 use crate::context::game_state::GameState;
 use crate::utils::card_class;
 use rand::Rng;
@@ -12,7 +14,7 @@ pub enum EnemyPos {
 
 
 pub enum Msg {
-    StateChanged(GameState),
+    StateChanged(Rc<RefCell<GameState>>),
 }
 
 #[derive(Clone, PartialEq, Properties)]
@@ -28,7 +30,7 @@ pub struct Enemy {
     total_cards: u8,
     bin: Vec<String>,
     is_turn: bool,
-    _listener: ContextHandle<GameState>
+    _listener: ContextHandle<Rc<RefCell<GameState>>>
 }
 
 impl Component for Enemy {
@@ -37,9 +39,9 @@ impl Component for Enemy {
 
     fn create(ctx: &Context<Self>) -> Self {
         let (state, _listener) = ctx.link()
-            .context::<GameState>(ctx.link().callback(Msg::StateChanged))
+            .context::<Rc<RefCell< GameState>>>(ctx.link().callback(Msg::StateChanged))
             .expect("context to be set");
-        let game_data = state.game_data.borrow();
+        let game_data = state.borrow();
         let index = ctx.props().index;
         let pos = ctx.props().pos.clone();
         Self{
@@ -57,7 +59,7 @@ impl Component for Enemy {
         match msg {
             Msg::StateChanged(state) => {
 
-                let game_data = state.game_data.borrow();
+                let game_data = state.borrow();
                 let index = self.index;
                 self.total_cards = game_data.players[index as usize].hand.len() as u8;
                 self.bin = game_data.players[index as usize].bin.clone();

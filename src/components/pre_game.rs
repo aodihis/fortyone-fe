@@ -1,3 +1,5 @@
+use std::cell::RefCell;
+use std::rc::Rc;
 use crate::context::game_state::GameState;
 use gloo_timers::future::TimeoutFuture;
 use web_sys::console::log_1;
@@ -126,20 +128,21 @@ pub fn CreateGame(props: &CreateGameProps) -> Html {
             let name = name_element.value();
             let mut game_state = game_state.clone();
             let callback = callback.clone();
-
-            spawn_local(async move {
-                match game_state.create_game().await {
-                    Ok(_) => {
-                        log_1(&"connect".into());
-                        
-                    }
-                    Err(_) => {window().unwrap().alert_with_message("Failed to connect!").unwrap();}
-                }
-
-                callback.emit(());
-                game_state.join_game(&name).await.expect("TODO: panic message");
-
-            });
+            game_state.create_game.emit(());
+            game_state.join.emit(("game_".to_string(), "ds".to_string()));
+            // spawn_local(async move {
+            //     match game_state.create_game().await {
+            //         Ok(_) => {
+            //             log_1(&"connect".into());
+            //
+            //         }
+            //         Err(_) => {window().unwrap().alert_with_message("Failed to connect!").unwrap();}
+            //     }
+            //
+            //     callback.emit(());
+            //     game_state.join_game(&name).await.expect("TODO: panic message");
+            //
+            // });
         })
     };
 
@@ -156,9 +159,9 @@ pub fn CreateGame(props: &CreateGameProps) -> Html {
 #[function_component]
 pub fn WaitingGame() -> Html {
     log_1(&"waiting".into());
-    let game_state: GameState = use_context::<GameState>().unwrap();
+    let game_state: Rc<RefCell<GameState>> = use_context::<Rc<RefCell<GameState>>>().unwrap();
     let copy_button_label = use_state(|| "📋");
-    let game_data = game_state.game_data.borrow();
+    let game_data = game_state.borrow();
     let game_id = match &game_data.game_id {
         Some(game_id) => game_id.clone(),
         _ => return html!(),

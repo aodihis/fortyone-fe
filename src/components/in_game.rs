@@ -1,3 +1,5 @@
+use std::cell::RefCell;
+use std::rc::Rc;
 use crate::components::current_player::CurrentPlayer;
 use crate::components::enemy::{Enemy, EnemyPos};
 use crate::context::game_state::{GameState, PlayerPhase};
@@ -14,7 +16,7 @@ enum Phase {
 }
 
 pub enum Msg {
-    StateChanged(GameState),
+    StateChanged(Rc<RefCell<GameState>>),
     PhaseChanged(Phase),
     CardBinShow(Option<usize>)
 }
@@ -26,7 +28,7 @@ pub struct InGame{
     card_left: u8,
     current_player_index: usize,
     player_turn_index: usize,
-    _listener: ContextHandle<GameState>
+    _listener: ContextHandle<Rc<RefCell<GameState>>>
 }
 
 impl Component for InGame{
@@ -36,9 +38,9 @@ impl Component for InGame{
     fn create(ctx: &Context<Self>) -> Self {
 
         let (state, _listener) = ctx.link()
-            .context::<GameState>(ctx.link().callback(Msg::StateChanged))
+            .context::<Rc<RefCell<GameState>>>(ctx.link().callback(Msg::StateChanged))
             .expect("context to be set");
-        let game_data = state.game_data.borrow();
+        let game_data = state.borrow();
         Self {
             player_phase: game_data.player_turn_phase.clone(),
             bin_index: None,
@@ -55,7 +57,7 @@ impl Component for InGame{
         match msg {
             Msg::StateChanged(state) => {
                 log_1(&"State Changed".into());
-                let game_data = state.game_data.borrow();
+                let game_data = state.borrow();
                 self.total_players = game_data.players.len() as u8;
                 self.current_player_index = game_data.current_player_index;
                 self.card_left = game_data.card_left;
@@ -200,8 +202,8 @@ pub struct CardBinShowCaseProps {
 #[function_component]
 pub fn CardBinShowCase(props: &CardBinShowCaseProps) -> Html {
 
-    let game_state: GameState = use_context::<GameState>().unwrap();
-    let game_data = game_state.game_data.borrow();
+    let game_state: Rc<RefCell<GameState>> = use_context::<Rc<RefCell<GameState>>>().unwrap();
+    let game_data = game_state.borrow();
     let onclose = {
         let cb = props.onclose.clone();
         Callback::from(move |_| {
