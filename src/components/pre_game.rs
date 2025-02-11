@@ -1,10 +1,11 @@
 use crate::context::game_state::GameState;
 use gloo_timers::future::TimeoutFuture;
+use std::rc::Rc;
 use web_sys::console::log_1;
 use web_sys::wasm_bindgen::JsCast;
 use web_sys::window;
 use yew::platform::spawn_local;
-use yew::{function_component, html, props, use_context, use_state, Callback, Html, Properties, SubmitEvent};
+use yew::{function_component, html, use_context, use_effect_with, use_state, Callback, Html, Properties, SubmitEvent};
 
 #[derive(Clone, PartialEq)]
 enum PreGamePhase {
@@ -27,7 +28,23 @@ pub struct PreGameProps {
 #[function_component]
 pub fn PreGame(_: &PreGameProps) -> Html {
 
+    let game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
     let phase = use_state(|| PreGamePhase::Home);
+
+    {
+        let game_state = game_state.clone();
+        let phase = phase.clone();
+
+        use_effect_with(game_state.game_id.clone(), move|game_id| {
+            if *phase == PreGamePhase::Waiting {
+            }
+            if game_id.is_some() {
+                phase.set(PreGamePhase::Waiting);
+            } else if game_id.is_none() && *phase == PreGamePhase::Waiting {
+                phase.set(PreGamePhase::Home);
+            }
+        })
+    }
     // let _game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
 
     let onclick = {
@@ -50,10 +67,26 @@ pub fn PreGame(_: &PreGameProps) -> Html {
     let create_onclick = onclick(Action::Create);
 
     let create_callback = {
+        let state = game_state.clone();
+        Callback::from(move |name| {
+            state.create_game.emit(name);
+            // phase.set(PreGamePhase::Waiting);
+    })};
+
+    let join_callback = {
+        let state = game_state.clone();
+        Callback::from(move |(game_id, name)| {
+            state.join.emit((game_id, name));
+        })
+    };
+
+    let back_callback = {
         let phase = phase.clone();
         Callback::from(move |_| {
-            phase.set(PreGamePhase::Waiting);
-    })};
+          phase.set(PreGamePhase::Home);
+        })
+    };
+
     html! {
         <div class="pre-game">
             {
@@ -67,18 +100,23 @@ pub fn PreGame(_: &PreGameProps) -> Html {
                 } else if *phase == PreGamePhase::Waiting {
                     html!(<WaitingGame/>)
                 } else if *phase == PreGamePhase::Create {
-                    html!(<CreateGame callback={create_callback}/>)
+                    html!(<CreateGame callback={create_callback} back={back_callback}/>)
                 } else{
-                    html!(<JoinGame/>)
+                    html!(<JoinGame callback={join_callback}/>)
                 }
             }
         </div>
     }
 }
 
+#[derive(Properties, PartialEq, Clone)]
+pub struct JoinGameProps {
+    callback: Callback<(String, String)>,
+}
 #[function_component]
-pub fn JoinGame() -> Html {
+pub fn JoinGame(props: &JoinGameProps) -> Html {
     log_1(&"join".into());
+    let callback = props.callback.clone();
     let onsubmit = Callback::from(move |e: SubmitEvent| {
         e.prevent_default();
         let target = e.target();
@@ -95,6 +133,8 @@ pub fn JoinGame() -> Html {
             }
             return;
         }
+
+        callback.emit((game_id, name));
     });
     html! {
         <div class="game-form">
@@ -109,62 +149,51 @@ pub fn JoinGame() -> Html {
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct CreateGameProps {
-    callback: Callback<()>,
+    callback: Callback<String>,
+    back: Callback<()>,
 }
 #[function_component]
 pub fn CreateGame(props: &CreateGameProps) -> Html {
-    web_sys::console::log_1(&"CreateGame".into());
-    let game_state: GameState = use_context::<GameState>().unwrap();
+
+    let back_cb = props.back.clone();
     let callback = props.callback.clone();
     let onsubmit = {
-        let game_state = game_state.clone();
+        // let game_state_ref = game_state_ref.clone();
         Callback::from(move |e: SubmitEvent| {
             e.prevent_default();
             let target = e.target();
             let form = target.and_then(|t| t.dyn_into::<web_sys::HtmlFormElement>().ok()).expect("Couldn't get HtmlFormElement");
             let name_element = form.get_with_name("name").and_then(|name| name.dyn_into::<web_sys::HtmlInputElement>().ok()).unwrap();
             let name = name_element.value();
-            let mut game_state = game_state.clone();
-            let callback = callback.clone();
-
-            spawn_local(async move {
-                match game_state.create_game().await {
-                    Ok(_) => {
-                        log_1(&"connect".into());
-                        
-                    }
-                    Err(_) => {window().unwrap().alert_with_message("Failed to connect!").unwrap();}
-                }
-
-                callback.emit(());
-                game_state.join_game(&name).await.expect("TODO: panic message");
-
-            });
+            callback.emit(name);
         })
     };
-
+    let onback = Callback::from(move |_| {
+        back_cb.emit(())
+    });
     html! {
         <div class="game-form">
             <form onsubmit={onsubmit}>
                 <input name="name" type="text" placeholder="Please, input your name"/>
-                <button type="submit">{"Join Game"}</button>
+                <button type="submit">{"Create Game"}</button>
             </form>
+            <button onclick={onback}>{"Back"}</button>
         </div>
     }
 }
 
+
 #[function_component]
 pub fn WaitingGame() -> Html {
     log_1(&"waiting".into());
-    let game_state: GameState = use_context::<GameState>().unwrap();
+    let game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
     let copy_button_label = use_state(|| "📋");
-    let game_data = game_state.game_data.borrow();
-    let game_id = match &game_data.game_id {
+    let game_id = match &game_state.game_id {
         Some(game_id) => game_id.clone(),
         _ => return html!(),
     };
 
-    let players = game_data.players.iter().map(|player|html!(<div class="wg-player">{player.name.clone()}</div>)).collect::<Html>();
+    let players = game_state.players.iter().map(|player|html!(<div class="wg-player">{player.name.clone()}</div>)).collect::<Html>();
     // let players = game_state.players.iter().map(|player|html!(<div class="wg-player">{player.name.clone()}</div>)).collect::<Html>();
 
     let copy_id = {
@@ -183,6 +212,21 @@ pub fn WaitingGame() -> Html {
             }
         }
     })};
+
+    let leave_onclick = {
+        let game_state = game_state.clone();
+        let disconnect = game_state.disconnect.clone();
+        Callback::from(move |_| {
+            disconnect.emit(());
+        })
+    };
+
+    let start_onclick = {
+        let start_game = game_state.start_game.clone();
+        Callback::from(move |_| {
+            start_game.emit(());
+        })
+    };
     html! {
         <>
             <div class="waiting-game">
@@ -200,13 +244,13 @@ pub fn WaitingGame() -> Html {
                         </button>
                     </div>
                     {
-                        if game_data.players.len() > 1 {
-                            html! {<button class="">{"Start Game"}</button>}
+                        if game_state.players.len() > 1 {
+                            html! {<button class="" onclick={start_onclick}>{"Start Game"}</button>}
                         } else {
                             html!{}
                         }
                     }
-                    <button class="">{"Leave"}</button>
+                    <button class="" onclick={leave_onclick}>{"Leave"}</button>
                 </div>
             </div>
         </>
