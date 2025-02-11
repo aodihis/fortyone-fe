@@ -1,5 +1,5 @@
+use crate::context::game_state::PlayerPhase;
 use serde::{Deserialize, Serialize};
-use crate::context::game_state::{EndGameScores, PlayerPhase};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
