@@ -1,16 +1,6 @@
-use crate::errors::game_error::GameError;
 use crate::models::players::Player;
-use crate::services::connection::{create_game, join_game};
 use serde::{Deserialize, Serialize};
-use std::cell::RefCell;
-use std::rc::Rc;
-use std::sync::Arc;
-use web_sys::console::log_1;
-use yew::platform::spawn_local;
-use futures_util::{SinkExt, StreamExt};
-use gloo_net::websocket::Message;
 use yew::Callback;
-use crate::models::api_data::{GameResponse, MessageType, PlayerData};
 
 #[derive(Debug,Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]

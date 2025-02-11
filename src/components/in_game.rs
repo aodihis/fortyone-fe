@@ -1,10 +1,9 @@
-use std::cell::RefCell;
-use std::rc::Rc;
 use crate::components::current_player::CurrentPlayer;
 use crate::components::enemy::{Enemy, EnemyPos};
 use crate::context::game_state::{GameState, PlayerPhase};
 use crate::utils::card_class;
 use gloo_timers::future::TimeoutFuture;
+use std::rc::Rc;
 use web_sys::console::log_1;
 use yew::platform::spawn_local;
 use yew::{classes, function_component, html, use_context, Callback, Component, Context, ContextHandle, Html, Properties};

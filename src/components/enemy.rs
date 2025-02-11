@@ -1,8 +1,7 @@
-use std::cell::RefCell;
-use std::rc::Rc;
 use crate::context::game_state::GameState;
 use crate::utils::card_class;
 use rand::Rng;
+use std::rc::Rc;
 use yew::{classes, html, Callback, Component, Context, ContextHandle, Html, Properties};
 
 #[derive(Clone, PartialEq)]

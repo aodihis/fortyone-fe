@@ -1,12 +1,11 @@
-use std::cell::RefCell;
-use std::rc::Rc;
 use crate::context::game_state::GameState;
 use gloo_timers::future::TimeoutFuture;
+use std::rc::Rc;
 use web_sys::console::log_1;
 use web_sys::wasm_bindgen::JsCast;
 use web_sys::window;
 use yew::platform::spawn_local;
-use yew::{function_component, html, use_context, use_effect_with, use_memo, use_state, Callback, Html, Properties, SubmitEvent};
+use yew::{function_component, html, use_context, use_effect_with, use_state, Callback, Html, Properties, SubmitEvent};
 
 #[derive(Clone, PartialEq)]
 enum PreGamePhase {

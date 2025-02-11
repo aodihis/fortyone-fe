@@ -14,7 +14,7 @@ use std::rc::Rc;
 use web_sys::console::log_1;
 use web_sys::window;
 use yew::platform::spawn_local;
-use yew::{html, Component, Context, ContextProvider, Html, Properties};
+use yew::{html, Component, Context, ContextProvider, Html};
 
 pub struct Game {
     state_ref: Rc<GameState>,
