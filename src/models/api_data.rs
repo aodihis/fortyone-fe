@@ -39,15 +39,18 @@ pub struct GameData {
     pub event: Option<GameEvent>,
     pub players: Vec<PlayerData>,
     pub winner_name: Option<String>,
-    pub scores: Option<Vec<EndGameScores>>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PlayerData {
     pub name: String,
-    pub hand: Vec<String>,
+    #[serde(default)]
     pub bin: Vec<String>,
+    pub hand: Vec<String>,
+    #[serde(default)]
+    pub score: i16,
 }
+
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]

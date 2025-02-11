@@ -29,14 +29,14 @@ pub fn PostGame(_: &Props) -> Html {
                     </thead>
                     <tbody>
                         {
-                            game_state.scores.iter().map(|score| {
+                            game_state.players.iter().map(|player| {
                                 html!{
                                     <tr>
-                                        <td>{score.name.clone()}</td>
+                                        <td>{player.name.clone()}</td>
                                         <td>
                                             <div class="cards">
                                                 {
-                                                    score.cards.iter().map(|card| {
+                                                    player.hand.iter().map(|card| {
                                                         let class = card_class(card);
                                                         html!{
                                                             <div class={classes!("card", class)}></div>
@@ -45,7 +45,7 @@ pub fn PostGame(_: &Props) -> Html {
                                                 }
                                             </div>
                                         </td>
-                                        <td>{score.score}</td>
+                                        <td>{player.score}</td>
                                     </tr>
                                 }
                             }).collect::<Html>()

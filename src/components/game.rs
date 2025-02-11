@@ -1,7 +1,7 @@
 use crate::components::in_game::InGame;
 use crate::components::pre_game::PreGame;
 use crate::context::game_state::{GameState, GameStatus};
-use crate::models::api_data::{GameRequestAction, GameResponse, MessageType, RequestPayload};
+use crate::models::api_data::{GameRequestAction, GameResponse, MessageType, PlayerData, RequestPayload};
 use crate::models::players::Player;
 use crate::services::connection::{create_game, join_game, send_message};
 use futures_util::future::{AbortHandle, Abortable};
@@ -144,6 +144,7 @@ impl Component for Game {
                                 name: player.name.clone(),
                                 bin: vec![],
                                 hand: vec![],
+                                score: 0,
                             }
                         }).collect();
                     },
@@ -153,6 +154,7 @@ impl Component for Game {
                                 name: player.name.clone(),
                                 bin: vec![],
                                 hand: vec![],
+                                score: 0,
                             }
                         }).collect();
                     },
@@ -166,6 +168,7 @@ impl Component for Game {
                                 name: player.name.clone(),
                                 bin: player.bin.clone(),
                                 hand: player.hand.clone(),
+                                score: 0,
                             }
                         }).collect();
                         state_mut.player_index = player_index;
@@ -179,7 +182,14 @@ impl Component for Game {
 
                         state_mut.game_status = GameStatus::PostGame;
                         state_mut.winner = data.winner_name.clone();
-                        state_mut.scores = data.scores.unwrap();
+                        state_mut.players = data.players.iter().map(|player: &PlayerData|{
+                            Player {
+                                name: player.name.clone(),
+                                bin: vec![],
+                                hand: player.hand.clone(),
+                                score: player.score,
+                            }
+                        }).collect();
                     },
                     _ => {}
                 }

@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use yew::Callback;
 
 #[derive(Debug,Clone, Serialize, Deserialize, PartialEq)]
-#[serde(rename_all = "lowercase")]
+#[serde(rename_all = "snake_case")]
 pub enum PlayerPhase {
     P1,
     P2,
@@ -49,7 +49,6 @@ pub struct GameState {
     pub current_turn_index: usize, // the turn index
     pub current_turn_phase: PlayerPhase,
     pub players: Vec<Player>,
-    pub scores: Vec<EndGameScores>,
     pub winner: Option<String>,
     pub _event: Option<InGameEvent>,
     pub counter: usize,
@@ -85,7 +84,6 @@ impl GameState {
             current_turn_phase: PlayerPhase::P1,
             player_name: "".to_string(),
             players: vec![],
-            scores: vec![],
             winner: None,
             _event: None,
             counter: 0,
