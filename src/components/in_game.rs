@@ -1,10 +1,9 @@
-use crate::components::player::ThePlayer;
 use crate::components::enemy::{Enemy, EnemyPos};
+use crate::components::player::ThePlayer;
 use crate::context::game_state::{GameState, PlayerPhase};
 use crate::utils::card_class;
 use gloo_timers::future::TimeoutFuture;
 use std::rc::Rc;
-use web_sys::console::log_1;
 use yew::platform::spawn_local;
 use yew::{classes, function_component, html, use_context, Callback, Component, Context, ContextHandle, Html, Properties};
 
@@ -56,9 +55,10 @@ impl Component for InGame{
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::StateChanged(state) => {
-                log_1(&"State Changed".into());
                 self.total_players = state.players.len() as u8;
                 self.player_index = state.player_index;
+                self.current_turn_index = state.current_turn_index;
+                self.player_phase = state.current_turn_phase.clone();
                 self.card_left = state.card_left;
                true
             }
@@ -83,7 +83,6 @@ impl Component for InGame{
             let link = link.clone();
             Callback::from(move |index: usize| {
 
-                log_1(&index.into());
                 link.send_message(Msg::CardBinShow(Some(index)));
         })};
 
@@ -101,9 +100,9 @@ impl Component for InGame{
 
         if self.phase == Phase::Dealing {
             let link = link.clone();
-            let time = self.total_players as u32 * 4 * 1000;
+            let time = self.total_players as f32 * 4.0 * 1000.0 * 0.5;
             spawn_local( async move {
-                TimeoutFuture::new(time).await;
+                TimeoutFuture::new(time as u32).await;
                 link.send_message(Msg::PhaseChanged(Phase::Sorting));
             });
         }
@@ -185,7 +184,8 @@ pub fn CardDistribution(props: &CardDistributionProps) -> Html {
                 (0..props.total_players*4).map(|i| {
                     let n : usize = (i % props.total_players) as usize;
                     let dir = direction[n];
-                    let style = format!("animation: {dir} 1s ease-in-out {i}s forwards;");
+                    let i  = i as f32 * 0.5;
+                    let style = format!("animation: {dir} 0.5s ease-in-out {i}s forwards;");
                     html!{
                         <div class="starting-card card card-back" style={style}></div>
                     }

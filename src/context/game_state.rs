@@ -8,6 +8,7 @@ pub enum PlayerPhase {
     P1,
     P2,
     Waiting,
+    GameEnded
 }
 #[derive(Clone)]
 pub enum InGameMovement {
@@ -28,9 +29,15 @@ pub struct InGameEvent {
 pub enum GameStatus {
     PreGame,
     InProgress,
-    _PostGame,
+    PostGame,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct EndGameScores {
+    pub name: String,
+    pub score: i16,
+    pub cards: Vec<String>,
+}
 #[derive(Clone)]
 pub struct GameState {
     // pub game_data: Rc<RefCell<GameData>>,
@@ -42,6 +49,8 @@ pub struct GameState {
     pub current_turn_index: usize, // the turn index
     pub current_turn_phase: PlayerPhase,
     pub players: Vec<Player>,
+    pub scores: Vec<EndGameScores>,
+    pub winner: Option<String>,
     pub _event: Option<InGameEvent>,
     pub counter: usize,
     pub create_game: Callback<String>,
@@ -76,6 +85,8 @@ impl GameState {
             current_turn_phase: PlayerPhase::P1,
             player_name: "".to_string(),
             players: vec![],
+            scores: vec![],
+            winner: None,
             _event: None,
             counter: 0,
             create_game,

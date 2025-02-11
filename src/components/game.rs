@@ -11,10 +11,10 @@ use gloo_net::websocket::futures::WebSocket;
 use gloo_net::websocket::Message;
 use std::cell::RefCell;
 use std::rc::Rc;
-use web_sys::console::log_1;
 use web_sys::window;
 use yew::platform::spawn_local;
 use yew::{html, Component, Context, ContextProvider, Html};
+use crate::components::post_game::PostGame;
 
 pub struct Game {
     state_ref: Rc<GameState>,
@@ -134,7 +134,6 @@ impl Component for Game {
                 false
             },
             Msg::GameUpdate(response) => {
-                log_1(&"Updating".into());
                 if response.status != "success" {
                     return false;
                 }
@@ -175,6 +174,13 @@ impl Component for Game {
                         state_mut.current_turn_phase = data.current_phase.unwrap();
                         // Rc::make_mut(&mut self.state_ref).current_player_name;
                     }
+                    MessageType::EndGame => {
+                        let data = response.data.unwrap();
+
+                        state_mut.game_status = GameStatus::PostGame;
+                        state_mut.winner = data.winner_name.clone();
+                        state_mut.scores = data.scores.unwrap();
+                    },
                     _ => {}
                 }
                 state_mut.counter += 1;
@@ -273,7 +279,6 @@ impl Component for Game {
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
-        log_1(&"Rpm".into());
         let game_data = self.state_ref.clone();
         html! {
             <div class="game-container">
@@ -281,8 +286,14 @@ impl Component for Game {
                     {
                         if game_data.game_status == GameStatus::PreGame {
                             html!{<PreGame/>}
-                        } else if game_data.game_status == GameStatus::InProgress {
+                        } else {
                             html!{<InGame/>}
+                        }
+                    }
+
+                    {
+                        if game_data.game_status == GameStatus::PostGame {
+                            html!{<PostGame/>}
                         } else {html!{}}
                     }
 

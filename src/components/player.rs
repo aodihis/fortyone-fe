@@ -121,18 +121,26 @@ impl Component for ThePlayer {
                             }).collect::<Html>()
                         }
                     </div>
-                    <div class="game-info">
-                        {
-                            if !self.is_turn {
-                                html! { "Waiting for the other player's turn!" }
-                            } else if self.player_phase == PlayerPhase::P1 {
-                                html! { <div><p>{ "Your turn to draw or take from the bin!" }</p><p>{"Click on deck or right click on bin"}</p></div> }
-                            } else {
-                                html!{ <div><p>{ "Remove a card from your hand!" }</p><p>{"Left click on card to discard or right click to end"}</p></div> }
+                    {
+                        if self.player_phase != PlayerPhase::GameEnded {
+                            html!{
+                                <div class="game-info">
+                                    {
+                                        if !self.is_turn {
+                                            html! { "Waiting for the other player's turn!" }
+                                        } else if self.player_phase == PlayerPhase::P1 {
+                                            html! { <div><p>{ "Your turn to draw or take from the bin!" }</p><p>{"Click on deck or right click on bin"}</p></div> }
+                                        } else {
+                                            html!{ <div><p>{ "Remove a card from your hand!" }</p><p>{"Left click on card to discard or right click to end"}</p></div> }
 
+                                        }
+                                    }
+                                </div>
                             }
+                        } else {
+                            html!{}
                         }
-                    </div>
+                    }
                     <div class="player-area">
                         {
                             self.hand.iter().map(|h| {

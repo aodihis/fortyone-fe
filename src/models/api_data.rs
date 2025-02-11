@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use crate::context::game_state::PlayerPhase;
+use crate::context::game_state::{EndGameScores, PlayerPhase};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -26,6 +26,8 @@ pub struct GameResponse {
     pub message: Option<String>
 }
 
+
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GameData {
     pub player_id: Option<String>,
@@ -37,7 +39,7 @@ pub struct GameData {
     pub event: Option<GameEvent>,
     pub players: Vec<PlayerData>,
     pub winner_name: Option<String>,
-    pub scores: Option<Vec<i16>>,
+    pub scores: Option<Vec<EndGameScores>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
