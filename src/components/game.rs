@@ -4,7 +4,8 @@ use crate::components::pre_game::PreGame;
 use crate::context::game_state::{GameState, GameStatus};
 use std::rc::Rc;
 use futures_util::stream::{SplitSink, SplitStream};
-use futures_util::{StreamExt, TryStreamExt};
+use futures_util::{SinkExt, StreamExt, TryStreamExt};
+use futures_util::future::{AbortHandle, Abortable};
 use gloo_net::websocket::futures::WebSocket;
 use gloo_net::websocket::{Message, WebSocketError};
 use web_sys::console::log_1;
@@ -19,10 +20,12 @@ use crate::services::connection::{create_game, join_game};
 pub struct Game {
     state_ref: Rc<GameState>,
     writer: Rc<RefCell<Option<SplitSink<WebSocket, Message>>>>,
+    reader_abort: Rc<RefCell<Option<AbortHandle>>>,
 }
 
 pub enum Msg {
     CreateGame(String),
+    Disconnect,
     JoinGame(String, String),
     Listener(SplitStream<WebSocket>),
     GameJoined(String),
@@ -35,11 +38,13 @@ impl Component for Game {
     fn create(ctx: &Context<Self>) -> Self {
         let create_game = ctx.link().callback(|name| Msg::CreateGame(name));
         let join_game = ctx.link().callback(|(game_id, name)| Msg::JoinGame(game_id, name));
-        let game_state = Rc::new(GameState::new(create_game, join_game));
+        let disconnect = ctx.link().callback(|_| Msg::Disconnect);
+        let game_state = Rc::new(GameState::new(create_game, join_game, disconnect));
 
         Self {
             state_ref: game_state,
             writer: Rc::new(RefCell::new(None)),
+            reader_abort: Rc::new(RefCell::new(None)),
         }
     }
 
@@ -83,7 +88,10 @@ impl Component for Game {
             },
             Msg::Listener(mut reader) => {
                 let link = ctx.link().clone();
-                spawn_local( async move {
+                let (abort_handle_inner, abort_registration) = AbortHandle::new_pair();
+                *self.reader_abort.borrow_mut() = Some(abort_handle_inner.clone());
+
+                let task = async move {
                     while let Some(msg) = reader.next().await {
                         match msg {
                             Ok(Message::Text(message)) => {
@@ -94,6 +102,11 @@ impl Component for Game {
                             Err(_) => {}
                         };
                     }
+                };
+
+                let abort_task = Abortable::new(task, abort_registration);
+                spawn_local(async move {
+                    let _ = abort_task.await;
                 });
                 false
             },
@@ -124,6 +137,19 @@ impl Component for Game {
                     _ => {}
                 }
                 Rc::make_mut(&mut self.state_ref).counter += 1;
+                true
+            }
+            Msg::Disconnect => {
+                Rc::make_mut(&mut self.state_ref).clear();
+                if let Some(handle) = self.reader_abort.borrow_mut().take() {
+                    handle.abort();
+                }
+                let wr = self.writer.borrow_mut().take();
+                spawn_local(async move {
+                    if let Some(mut writer) = wr {
+                        writer.close().await.unwrap();
+                    }
+                });
                 true
             }
         }

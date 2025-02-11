@@ -26,7 +26,7 @@ pub async fn create_game() -> Result<String, GameError> {
 
 }
 
-pub fn join_game(game_id: &str, name: &str) -> Result<(WebSocket), GameError> {
+pub fn join_game(game_id: &str, name: &str) -> Result<WebSocket, GameError> {
     let api_url: &str = API_URL;
 
     let socket = match WebSocket::open(&format!("{}/{}/join?player_name={}", api_url, game_id, name)) {

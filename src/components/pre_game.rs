@@ -32,14 +32,17 @@ pub fn PreGame(_: &PreGameProps) -> Html {
     let game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
     let phase = use_state(|| PreGamePhase::Home);
 
-    log_1(&"P Render".into());
     {
         let game_state = game_state.clone();
         let phase = phase.clone();
 
         use_effect_with(game_state.game_id.clone(), move|game_id| {
+            if *phase == PreGamePhase::Waiting {
+            }
             if game_id.is_some() {
                 phase.set(PreGamePhase::Waiting);
+            } else if game_id.is_none() && *phase == PreGamePhase::Waiting {
+                phase.set(PreGamePhase::Home);
             }
         })
     }
@@ -170,6 +173,7 @@ pub fn CreateGame(props: &CreateGameProps) -> Html {
     }
 }
 
+
 #[function_component]
 pub fn WaitingGame() -> Html {
     log_1(&"waiting".into());
@@ -199,6 +203,14 @@ pub fn WaitingGame() -> Html {
             }
         }
     })};
+
+    let leave_onclick = {
+        let game_state = game_state.clone();
+        let disconnect = game_state.disconnect.clone();
+        Callback::from(move |_| {
+            disconnect.emit(());
+        })
+    };
     html! {
         <>
             <div class="waiting-game">
@@ -222,7 +234,7 @@ pub fn WaitingGame() -> Html {
                             html!{}
                         }
                     }
-                    <button class="">{"Leave"}</button>
+                    <button class="" onclick={leave_onclick}>{"Leave"}</button>
                 </div>
             </div>
         </>
