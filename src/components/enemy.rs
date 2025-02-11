@@ -14,7 +14,7 @@ pub enum EnemyPos {
 
 
 pub enum Msg {
-    StateChanged(Rc<RefCell<GameState>>),
+    StateChanged(Rc<GameState>),
 }
 
 #[derive(Clone, PartialEq, Properties)]
@@ -30,7 +30,7 @@ pub struct Enemy {
     total_cards: u8,
     bin: Vec<String>,
     is_turn: bool,
-    _listener: ContextHandle<Rc<RefCell<GameState>>>
+    _listener: ContextHandle<Rc<GameState>>
 }
 
 impl Component for Enemy {
@@ -39,18 +39,17 @@ impl Component for Enemy {
 
     fn create(ctx: &Context<Self>) -> Self {
         let (state, _listener) = ctx.link()
-            .context::<Rc<RefCell< GameState>>>(ctx.link().callback(Msg::StateChanged))
+            .context::<Rc< GameState>>(ctx.link().callback(Msg::StateChanged))
             .expect("context to be set");
-        let game_data = state.borrow();
         let index = ctx.props().index;
         let pos = ctx.props().pos.clone();
         Self{
             index,
             pos,
-            name: game_data.players[index as usize].name.clone(),
-            total_cards: game_data.players[index as usize].hand.len() as u8,
-            bin: game_data.players[index as usize].bin.clone(),
-            is_turn: game_data.current_player_index == index as usize,
+            name: state.players[index as usize].name.clone(),
+            total_cards: state.players[index as usize].hand.len() as u8,
+            bin: state.players[index as usize].bin.clone(),
+            is_turn: state.current_player_index == index as usize,
             _listener,
         }
     }
@@ -59,11 +58,10 @@ impl Component for Enemy {
         match msg {
             Msg::StateChanged(state) => {
 
-                let game_data = state.borrow();
                 let index = self.index;
-                self.total_cards = game_data.players[index as usize].hand.len() as u8;
-                self.bin = game_data.players[index as usize].bin.clone();
-                self.is_turn = game_data.current_player_index == index as usize;
+                self.total_cards = state.players[index as usize].hand.len() as u8;
+                self.bin = state.players[index as usize].bin.clone();
+                self.is_turn = state.current_player_index == index as usize;
                 true
             }
         }

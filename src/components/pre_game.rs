@@ -6,7 +6,7 @@ use web_sys::console::log_1;
 use web_sys::wasm_bindgen::JsCast;
 use web_sys::window;
 use yew::platform::spawn_local;
-use yew::{function_component, html, props, use_context, use_state, Callback, Html, Properties, SubmitEvent};
+use yew::{function_component, html, use_context, use_effect_with, use_memo, use_state, Callback, Html, Properties, SubmitEvent};
 
 #[derive(Clone, PartialEq)]
 enum PreGamePhase {
@@ -29,7 +29,20 @@ pub struct PreGameProps {
 #[function_component]
 pub fn PreGame(_: &PreGameProps) -> Html {
 
+    let game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
     let phase = use_state(|| PreGamePhase::Home);
+
+    log_1(&"P Render".into());
+    {
+        let game_state = game_state.clone();
+        let phase = phase.clone();
+
+        use_effect_with(game_state.game_id.clone(), move|game_id| {
+            if game_id.is_some() {
+                phase.set(PreGamePhase::Waiting);
+            }
+        })
+    }
     // let _game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
 
     let onclick = {
@@ -52,10 +65,12 @@ pub fn PreGame(_: &PreGameProps) -> Html {
     let create_onclick = onclick(Action::Create);
 
     let create_callback = {
-        let phase = phase.clone();
-        Callback::from(move |_| {
-            phase.set(PreGamePhase::Waiting);
+        let state = game_state.clone();
+        Callback::from(move |name| {
+            state.create_game.emit(name);
+            // phase.set(PreGamePhase::Waiting);
     })};
+
     html! {
         <div class="pre-game">
             {
@@ -111,25 +126,26 @@ pub fn JoinGame() -> Html {
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct CreateGameProps {
-    callback: Callback<()>,
+    callback: Callback<String>,
 }
 #[function_component]
 pub fn CreateGame(props: &CreateGameProps) -> Html {
-    web_sys::console::log_1(&"CreateGame".into());
-    let game_state: GameState = use_context::<GameState>().unwrap();
+    log_1(&"Render".into());
+    // web_sys::console::log_1(&"CreateGame".into());
+    // let game_state_ref: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
     let callback = props.callback.clone();
     let onsubmit = {
-        let game_state = game_state.clone();
+        // let game_state_ref = game_state_ref.clone();
         Callback::from(move |e: SubmitEvent| {
             e.prevent_default();
             let target = e.target();
             let form = target.and_then(|t| t.dyn_into::<web_sys::HtmlFormElement>().ok()).expect("Couldn't get HtmlFormElement");
             let name_element = form.get_with_name("name").and_then(|name| name.dyn_into::<web_sys::HtmlInputElement>().ok()).unwrap();
             let name = name_element.value();
-            let mut game_state = game_state.clone();
-            let callback = callback.clone();
-            game_state.create_game.emit(());
-            game_state.join.emit(("game_".to_string(), "ds".to_string()));
+            // let mut game_state = game_state_ref.borrow();
+            callback.emit(name);
+            // game_state.create_game.emit(());
+            // game_state.join.emit(("game_".to_string(), "ds".to_string()));
             // spawn_local(async move {
             //     match game_state.create_game().await {
             //         Ok(_) => {
@@ -159,15 +175,14 @@ pub fn CreateGame(props: &CreateGameProps) -> Html {
 #[function_component]
 pub fn WaitingGame() -> Html {
     log_1(&"waiting".into());
-    let game_state: Rc<RefCell<GameState>> = use_context::<Rc<RefCell<GameState>>>().unwrap();
+    let game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
     let copy_button_label = use_state(|| "📋");
-    let game_data = game_state.borrow();
-    let game_id = match &game_data.game_id {
+    let game_id = match &game_state.game_id {
         Some(game_id) => game_id.clone(),
         _ => return html!(),
     };
 
-    let players = game_data.players.iter().map(|player|html!(<div class="wg-player">{player.name.clone()}</div>)).collect::<Html>();
+    let players = game_state.players.iter().map(|player|html!(<div class="wg-player">{player.name.clone()}</div>)).collect::<Html>();
     // let players = game_state.players.iter().map(|player|html!(<div class="wg-player">{player.name.clone()}</div>)).collect::<Html>();
 
     let copy_id = {
@@ -203,7 +218,7 @@ pub fn WaitingGame() -> Html {
                         </button>
                     </div>
                     {
-                        if game_data.players.len() > 1 {
+                        if game_state.players.len() > 1 {
                             html! {<button class="">{"Start Game"}</button>}
                         } else {
                             html!{}

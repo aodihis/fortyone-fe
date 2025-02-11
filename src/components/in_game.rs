@@ -10,13 +10,13 @@ use yew::platform::spawn_local;
 use yew::{classes, function_component, html, use_context, Callback, Component, Context, ContextHandle, Html, Properties};
 
 #[derive(PartialEq)]
-enum Phase {
+pub enum Phase {
     Dealing,
     Sorting,
 }
 
 pub enum Msg {
-    StateChanged(Rc<RefCell<GameState>>),
+    StateChanged(Rc<GameState>),
     PhaseChanged(Phase),
     CardBinShow(Option<usize>)
 }
@@ -28,7 +28,7 @@ pub struct InGame{
     card_left: u8,
     current_player_index: usize,
     player_turn_index: usize,
-    _listener: ContextHandle<Rc<RefCell<GameState>>>
+    _listener: ContextHandle<Rc<GameState>>
 }
 
 impl Component for InGame{
@@ -38,17 +38,16 @@ impl Component for InGame{
     fn create(ctx: &Context<Self>) -> Self {
 
         let (state, _listener) = ctx.link()
-            .context::<Rc<RefCell<GameState>>>(ctx.link().callback(Msg::StateChanged))
+            .context::<Rc<GameState>>(ctx.link().callback(Msg::StateChanged))
             .expect("context to be set");
-        let game_data = state.borrow();
         Self {
-            player_phase: game_data.player_turn_phase.clone(),
+            player_phase: state.player_turn_phase.clone(),
             bin_index: None,
             phase: Phase::Sorting,
-            total_players: game_data.players.len() as u8,
-            current_player_index: game_data.current_player_index,
-            player_turn_index: game_data.player_turn_index,
-            card_left: game_data.card_left,
+            total_players: state.players.len() as u8,
+            current_player_index: state.current_player_index,
+            player_turn_index: state.player_turn_index,
+            card_left: state.card_left,
             _listener,
         }
     }
@@ -57,10 +56,9 @@ impl Component for InGame{
         match msg {
             Msg::StateChanged(state) => {
                 log_1(&"State Changed".into());
-                let game_data = state.borrow();
-                self.total_players = game_data.players.len() as u8;
-                self.current_player_index = game_data.current_player_index;
-                self.card_left = game_data.card_left;
+                self.total_players = state.players.len() as u8;
+                self.current_player_index = state.current_player_index;
+                self.card_left = state.card_left;
                true
             }
             Msg::PhaseChanged(phase) => {
@@ -202,8 +200,7 @@ pub struct CardBinShowCaseProps {
 #[function_component]
 pub fn CardBinShowCase(props: &CardBinShowCaseProps) -> Html {
 
-    let game_state: Rc<RefCell<GameState>> = use_context::<Rc<RefCell<GameState>>>().unwrap();
-    let game_data = game_state.borrow();
+    let game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
     let onclose = {
         let cb = props.onclose.clone();
         Callback::from(move |_| {
@@ -212,7 +209,7 @@ pub fn CardBinShowCase(props: &CardBinShowCaseProps) -> Html {
     };
 
     let bin_index = props.bin_index;
-    let cards = game_data.players[bin_index].bin.iter().rev().map(|card| {
+    let cards = game_state.players[bin_index].bin.iter().rev().map(|card| {
         let class = card_class(card);
         html!{
             <div class={classes!("card", class)}></div>

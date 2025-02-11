@@ -42,11 +42,6 @@ pub enum GameStatus {
 }
 
 #[derive(Clone)]
-pub struct GameData {
-    
-}
-
-#[derive(Clone)]
 pub struct GameState {
     // pub game_data: Rc<RefCell<GameData>>,
     pub game_status: GameStatus,
@@ -59,7 +54,7 @@ pub struct GameState {
     pub players: Vec<Player>,
     pub _event: Option<InGameEvent>,
     pub counter: usize,
-    pub create_game: Callback<()>,
+    pub create_game: Callback<String>,
     pub join: Callback<(String, String)>,
     // pub join: Callback<String>,
     // pub create_game: Callback<()>,
@@ -74,7 +69,7 @@ impl PartialEq for GameState {
 
 impl GameState {
 
-    pub fn new(create_game: Callback<()>, join: Callback<(String, String)>) -> GameState {
+    pub fn new(create_game: Callback<String>, join: Callback<(String, String)>) -> GameState {
         Self {
             game_status: GameStatus::PreGame,
             game_id: None,

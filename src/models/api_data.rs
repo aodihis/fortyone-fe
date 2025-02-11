@@ -57,7 +57,7 @@ enum GameEventType {
 
 }
 #[derive(Debug, Serialize, Deserialize, Clone)]
-struct GameEvent {
+pub struct GameEvent {
     event_type: GameEventType,
     from: Option<u8>,
     to: Option<u8>,
