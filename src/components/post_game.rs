@@ -1,5 +1,5 @@
 use std::rc::Rc;
-use yew::{html, Properties, Html, function_component, use_context, classes};
+use yew::{html, Properties, Html, function_component, use_context, classes, Callback};
 use crate::context::game_state::GameState;
 use crate::utils::card_class;
 
@@ -10,9 +10,12 @@ pub struct Props {
 #[function_component]
 pub fn PostGame(_: &Props) -> Html {
     let game_state: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
-
+    let disconnect = game_state.disconnect.clone();
     let winner = game_state.winner.clone();
 
+    let leave = Callback::from(move |_| {
+        disconnect.emit(());
+    });
 
     html! {
         <div class="overlay" id="post-game-overlay">
@@ -52,13 +55,17 @@ pub fn PostGame(_: &Props) -> Html {
                         }
                     </tbody>
                 </table>
-                {
-                    if let Some(winner) = winner {
-                        html!{<h3 class="winner-name">{format!{"Winner: {}", winner}}</h3>}
-                    } else {
-                        html!{}
+                <div class="post-footer">
+
+                    {
+                        if let Some(winner) = winner {
+                            html!{<h3 class="winner-name">{format!{"Winner: {}", winner}}</h3>}
+                        } else {
+                            html!{<h3>{"It's a draw!"}</h3>}
+                        }
                     }
-                }
+                    <button onclick={leave}>{"Leave Game"}</button>
+                </div>
             </div>
         </div>
     }

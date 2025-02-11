@@ -768,6 +768,7 @@ button:hover {
     margin: 20px auto;
     width: 70%;
     border-spacing: 0 10px;
+    min-height: 200px;
 }
 
 .post-game .cards {
@@ -781,6 +782,17 @@ button:hover {
 
 .post-game .winner-name {
     text-align: left;
+}
+
+.post-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     width: 60%;
     margin: auto;
+}
+
+.post-footer button {
+    height: fit-content;
+    width: 150px;
 }
