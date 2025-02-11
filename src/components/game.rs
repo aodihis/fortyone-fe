@@ -112,6 +112,15 @@ impl Component for Game {
                             }
                         }).collect();
                     },
+                    MessageType::PlayerLeft => {
+                        Rc::make_mut(&mut self.state_ref).players = response.data.unwrap().players.iter().map(|player|{
+                            Player {
+                                name: player.name.clone(),
+                                bin: vec![],
+                                hand: vec![],
+                            }
+                        }).collect();
+                    },
                     _ => {}
                 }
                 Rc::make_mut(&mut self.state_ref).counter += 1;

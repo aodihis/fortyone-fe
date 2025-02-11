@@ -71,6 +71,13 @@ pub fn PreGame(_: &PreGameProps) -> Html {
             // phase.set(PreGamePhase::Waiting);
     })};
 
+    let join_callback = {
+        let state = game_state.clone();
+        Callback::from(move |(game_id, name)| {
+            state.join.emit((game_id, name));
+        })
+    };
+
     html! {
         <div class="pre-game">
             {
@@ -86,16 +93,21 @@ pub fn PreGame(_: &PreGameProps) -> Html {
                 } else if *phase == PreGamePhase::Create {
                     html!(<CreateGame callback={create_callback}/>)
                 } else{
-                    html!(<JoinGame/>)
+                    html!(<JoinGame callback={join_callback}/>)
                 }
             }
         </div>
     }
 }
 
+#[derive(Properties, PartialEq, Clone)]
+pub struct JoinGameProps {
+    callback: Callback<(String, String)>,
+}
 #[function_component]
-pub fn JoinGame() -> Html {
+pub fn JoinGame(props: &JoinGameProps) -> Html {
     log_1(&"join".into());
+    let callback = props.callback.clone();
     let onsubmit = Callback::from(move |e: SubmitEvent| {
         e.prevent_default();
         let target = e.target();
@@ -112,6 +124,8 @@ pub fn JoinGame() -> Html {
             }
             return;
         }
+
+        callback.emit((game_id, name));
     });
     html! {
         <div class="game-form">
@@ -142,23 +156,7 @@ pub fn CreateGame(props: &CreateGameProps) -> Html {
             let form = target.and_then(|t| t.dyn_into::<web_sys::HtmlFormElement>().ok()).expect("Couldn't get HtmlFormElement");
             let name_element = form.get_with_name("name").and_then(|name| name.dyn_into::<web_sys::HtmlInputElement>().ok()).unwrap();
             let name = name_element.value();
-            // let mut game_state = game_state_ref.borrow();
             callback.emit(name);
-            // game_state.create_game.emit(());
-            // game_state.join.emit(("game_".to_string(), "ds".to_string()));
-            // spawn_local(async move {
-            //     match game_state.create_game().await {
-            //         Ok(_) => {
-            //             log_1(&"connect".into());
-            //
-            //         }
-            //         Err(_) => {window().unwrap().alert_with_message("Failed to connect!").unwrap();}
-            //     }
-            //
-            //     callback.emit(());
-            //     game_state.join_game(&name).await.expect("TODO: panic message");
-            //
-            // });
         })
     };
 
