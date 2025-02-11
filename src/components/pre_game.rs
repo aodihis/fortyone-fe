@@ -80,6 +80,13 @@ pub fn PreGame(_: &PreGameProps) -> Html {
         })
     };
 
+    let back_callback = {
+        let phase = phase.clone();
+        Callback::from(move |_| {
+          phase.set(PreGamePhase::Home);
+        })
+    };
+
     html! {
         <div class="pre-game">
             {
@@ -93,7 +100,7 @@ pub fn PreGame(_: &PreGameProps) -> Html {
                 } else if *phase == PreGamePhase::Waiting {
                     html!(<WaitingGame/>)
                 } else if *phase == PreGamePhase::Create {
-                    html!(<CreateGame callback={create_callback}/>)
+                    html!(<CreateGame callback={create_callback} back={back_callback}/>)
                 } else{
                     html!(<JoinGame callback={join_callback}/>)
                 }
@@ -143,12 +150,12 @@ pub fn JoinGame(props: &JoinGameProps) -> Html {
 #[derive(Properties, PartialEq, Clone)]
 pub struct CreateGameProps {
     callback: Callback<String>,
+    back: Callback<()>,
 }
 #[function_component]
 pub fn CreateGame(props: &CreateGameProps) -> Html {
-    log_1(&"Render".into());
-    // web_sys::console::log_1(&"CreateGame".into());
-    // let game_state_ref: Rc<GameState> = use_context::<Rc<GameState>>().unwrap();
+
+    let back_cb = props.back.clone();
     let callback = props.callback.clone();
     let onsubmit = {
         // let game_state_ref = game_state_ref.clone();
@@ -161,13 +168,16 @@ pub fn CreateGame(props: &CreateGameProps) -> Html {
             callback.emit(name);
         })
     };
-
+    let onback = Callback::from(move |_| {
+        back_cb.emit(())
+    });
     html! {
         <div class="game-form">
             <form onsubmit={onsubmit}>
                 <input name="name" type="text" placeholder="Please, input your name"/>
                 <button type="submit">{"Join Game"}</button>
             </form>
+            <button onclick={onback}>{"Back"}</button>
         </div>
     }
 }

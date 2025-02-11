@@ -178,7 +178,7 @@ pub fn CardDistribution(props: &CardDistributionProps) -> Html {
         <>
             {
                 (0..props.total_players*4).map(|i| {
-                    let n : usize = i as usize % 4;
+                    let n : usize = (i % props.total_players) as usize;
                     let dir = direction[n];
                     let style = format!("animation: {dir} 1s ease-in-out {i}s forwards;");
                     html!{
