@@ -69,7 +69,7 @@ impl Component for Game {
                         Err(_) => {
                             if let Some(window) = window() {
                                 window
-                                    .alert_with_message("Connection error!")
+                                    .alert_with_message("Failed to connect to the server, please wait a few minutes.")
                                     .unwrap();
                             }
                             return;
@@ -94,7 +94,7 @@ impl Component for Game {
                         Err(_) => {
                             if let Some(window) = window() {
                                 window
-                                    .alert_with_message("Connection error!")
+                                    .alert_with_message("Failed to connect to the server, please wait a few minutes.")
                                     .unwrap();
                             }
                         }
